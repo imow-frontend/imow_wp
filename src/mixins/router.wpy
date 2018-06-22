@@ -1,0 +1,102 @@
+<script>
+import wepy from 'wepy'
+
+/**
+ * 分页通用方法
+ */
+export default class router extends wepy.mixin {
+  /**
+   * 后退
+   */
+  navigateBack(delta) {
+    wx.navigateBack({
+      delta: delta || 1
+    })
+  }
+
+    /**
+   * 跳转到首页
+   */
+  routeToMember() {
+    this.$root.$switch(`/pages/member`)
+  }
+
+  /**
+   * 跳转到首页
+   */
+  routeToIndex() {
+    this.$root.$switch(`/pages/index`)
+  }
+
+   /**
+   * 跳转到登录
+   */
+  routeToLogin() {
+    // 登录跳转不关闭当前页面,只做一个单纯的跳转，在登录也返回上一级
+    wx.navigateTo({url: `/pages/login`})
+  }
+
+  /**
+   * 跳转到注册
+   */
+  routeToRegister() {
+    wx.redirectTo({url: `/pages/register`})
+  }
+
+  redirectToLogin() {
+    // 登录跳转不关闭当前页面,只做一个单纯的跳转，在登录也返回上一级
+    wx.redirectTo({url: `/pages/login`})
+  }
+
+  routeToLogisticsTypePost() {
+    wx.navigateTo({url: `/pages/postLogisticsType`})
+  }
+
+  routeToFindCargoPost() {
+    // $switch不允许携带参数到下一个页面所以设置一个全局的变量来传值
+    wepy.$instance.globalData.pageParams['pages/postLogistics'] = {postType: 1}
+    wx.navigateTo({url: `/pages/postLogistics`})
+  }
+
+  routeToFindTruckPost() {
+    wepy.$instance.globalData.pageParams['pages/postLogistics'] = {postType: 2}
+    wx.navigateTo({url: `/pages/postLogistics`})
+  }
+
+  routeTopostNews() {
+    wx.navigateTo({url: `/pages/postNews`})
+  }
+
+  methods = {
+    routeToIndex() {
+      this.routeToIndex()
+    },
+    routeToMember() {
+      this.routeToMember()
+    },
+    routeToLogin() {
+      this.routeToLogin()
+    },
+    routeToRegister() {
+      this.routeToRegister()
+    },
+    routeToFindCargoPost() {
+      this.routeToFindCargoPost()
+    },
+    routeToFindTruckPost() {
+      this.routeToFindTruckPost()
+    },
+    routeToLogisticsTypePost() {
+      this.routeToLogisticsTypePost()
+    },
+    routeTopostNews() {
+      this.routeTopostNews()
+    },
+    redirectToLogin() {
+      this.redirectToLogin()
+    }
+
+  };
+  events = {};
+}
+</script>

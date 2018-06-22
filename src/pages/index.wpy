@@ -1,0 +1,117 @@
+<template>
+  <view class="index-container">
+    <Category :list.sync="categorys" col="3"></Category>
+    <view class="btn-warp zan-clearfix">
+      <button class="zan-btn {{postType==1?'on':''}}" @tap="changeType" data-postType="1">我有车</button>
+      <button class="zan-btn {{postType==2?'on':''}}" @tap="changeType" data-postType="2">我有货</button>
+    </view>
+    <freightList :page.sync="page" />
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import store from '../store/utils'
+import Swiper from '../components/swiper'
+import Category from '../components/category'
+import freightList from '../components/freightList'
+import postRequire from '../api/postRequire'
+import pagination from '../mixins/pagination'
+import base from '../mixins/base'
+
+export default class Index extends wepy.page {
+  components = {
+    Swiper: Swiper,
+    freightList,
+    Category
+  };
+  data = {
+    init: false,
+    postType: 1,
+    swipers: [
+      {
+        image: 'http://img.imow.cn/Upload/ad/20171220/636493531397984321.jpg'
+      },
+      {
+        image: 'http://img.imow.cn/Upload/ad/20170708/636350905399220018.jpg'
+      }
+    ],
+    page: {
+      list: []
+    },
+    categorys: [
+      { title: '拼物流', image: '/images/IMG_1385.JPG', url: 'search' },
+      { title: '二手车买卖', image: '/images/IMG_1385.JPG' },
+      { title: '行业动态', image: '/images/IMG_1385.JPG' }
+    ]
+  };
+  params() {
+    return {
+      freightType: this.postType
+    }
+  }
+  config = {
+    navigationBarTitleText: '阿母工业'
+  };
+  methods = {
+    async changeType(evt) {
+      const newType = evt.currentTarget.dataset.posttype === '1' ? 1 : 2
+      if (this.postType !== newType) {
+        this.postType = newType
+        this.page.clear()
+        this.page.reset()
+        await this.next()
+      }
+    }
+  }
+  async onLoad() {
+    this.page = postRequire.page()
+    await this.next()
+    await store.init()
+  }
+  mixins = [pagination, base];
+}
+</script>
+
+<style lang="scss">
+@import '../styles/zan/common.scss';
+@import '../styles/zan/btn.scss';
+@import '../styles/zan/helper.scss';
+.btn-warp{
+  border-radius: 25px;
+  width: 515rpx;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow:0rpx 0rpx 12rpx 12rpx #f1e8e8;
+  .zan-btn{
+    float: left;
+    width: 50%;
+    margin:0px;
+    padding: 0px;
+    border: 0px;
+    height: 65rpx;
+    line-height: 65rpx;
+    
+    &:first-child{
+        border-radius:25px 0px 0px 25px;
+    }
+   &:last-child{
+    border-radius:0px 25px 25px 0px;
+    }
+    &.on{
+        border-radius:25px;
+        color: $white;
+        background-color: $red;
+    }
+  }
+  .zan-btn:after{
+    border-width: 0px
+  }
+}
+
+.index-container{
+  background:$white
+}
+
+
+</style>
