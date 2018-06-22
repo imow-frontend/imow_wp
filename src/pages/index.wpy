@@ -1,29 +1,14 @@
 <template>
-  <view class="index-container">
-    <Category :list.sync="categorys" col="3"></Category>
-    <view class="btn-warp zan-clearfix">
-      <button class="zan-btn {{postType==1?'on':''}}" @tap="changeType" data-postType="1">我有车</button>
-      <button class="zan-btn {{postType==2?'on':''}}" @tap="changeType" data-postType="2">我有货</button>
-    </view>
-    <freightList :page.sync="page" />
-  </view>
+  <SearchBar />
 </template>
 
 <script>
 import wepy from 'wepy'
-import store from '../store/utils'
-import Swiper from '../components/swiper'
-import Category from '../components/category'
-import freightList from '../components/freightList'
-import postRequire from '../api/postRequire'
-import pagination from '../mixins/pagination'
-import base from '../mixins/base'
+import SearchBar from '../components/weui/search_bar'
 
 export default class Index extends wepy.page {
   components = {
-    Swiper: Swiper,
-    freightList,
-    Category
+    SearchBar
   };
   data = {
     init: false,
@@ -65,53 +50,53 @@ export default class Index extends wepy.page {
     }
   }
   async onLoad() {
-    this.page = postRequire.page()
-    await this.next()
-    await store.init()
+    // this.page = postRequire.page()
+    // await this.next()
+    // await store.init()
   }
-  mixins = [pagination, base];
+  // mixins = [pagination, base];
 }
 </script>
 
 <style lang="scss">
-@import '../styles/zan/common.scss';
-@import '../styles/zan/btn.scss';
-@import '../styles/zan/helper.scss';
-.btn-warp{
-  border-radius: 25px;
-  width: 515rpx;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow:0rpx 0rpx 12rpx 12rpx #f1e8e8;
-  .zan-btn{
-    float: left;
-    width: 50%;
-    margin:0px;
-    padding: 0px;
-    border: 0px;
-    height: 65rpx;
-    line-height: 65rpx;
+// @import '../styles/zan/common.scss';
+// @import '../styles/zan/btn.scss';
+// @import '../styles/zan/helper.scss';
+// .btn-warp{
+//   border-radius: 25px;
+//   width: 515rpx;
+//   margin-left: auto;
+//   margin-right: auto;
+//   box-shadow:0rpx 0rpx 12rpx 12rpx #f1e8e8;
+//   .zan-btn{
+//     float: left;
+//     width: 50%;
+//     margin:0px;
+//     padding: 0px;
+//     border: 0px;
+//     height: 65rpx;
+//     line-height: 65rpx;
     
-    &:first-child{
-        border-radius:25px 0px 0px 25px;
-    }
-   &:last-child{
-    border-radius:0px 25px 25px 0px;
-    }
-    &.on{
-        border-radius:25px;
-        color: $white;
-        background-color: $red;
-    }
-  }
-  .zan-btn:after{
-    border-width: 0px
-  }
-}
+//     &:first-child{
+//         border-radius:25px 0px 0px 25px;
+//     }
+//    &:last-child{
+//     border-radius:0px 25px 25px 0px;
+//     }
+//     &.on{
+//         border-radius:25px;
+//         color: $white;
+//         background-color: $red;
+//     }
+//   }
+//   .zan-btn:after{
+//     border-width: 0px
+//   }
+// }
 
-.index-container{
-  background:$white
-}
+// .index-container{
+//   background:$white
+// }
 
 
 </style>
