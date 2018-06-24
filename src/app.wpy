@@ -11,35 +11,38 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/index'
+      'pages/index',
+      'pages/post'
     ],
     window: {
-      backgroundTextStyle: 'dark',
-      backgroundColor: '#F5F5F5',
-      navigationBarBackgroundColor: '#d81e06'
+      'backgroundTextStyle': 'light',
+      'navigationBarBackgroundColor': '#fff',
+      'navigationBarTitleText': '每天抽福利',
+      'navigationBarTextStyle': 'black',
+      'navigationStyle': 'custom'
     },
-    // tabBar: {
-    //   color: '#AEADAD',
-    //   selectedColor: '#d81e06',
-    //   backgroundColor: '#fff',
-    //   borderStyle: 'black',
-    //   list: [{
-    //     pagePath: 'pages/index',
-    //     text: '广场',
-    //     iconPath: '/images/home.png',
-    //     selectedIconPath: '/images/home_selected.png'
-    //   }, {
-    //     pagePath: 'pages/postType',
-    //     text: '发布',
-    //     iconPath: '/images/post.png',
-    //     selectedIconPath: '/images/post_selected.png'
-    //   }, {
-    //     pagePath: 'pages/member',
-    //     text: '我的',
-    //     iconPath: '/images/member.png',
-    //     selectedIconPath: '/images/member_selected.png'
-    //   }]
-    // },
+    tabBar: {
+      color: '#AEADAD',
+      selectedColor: '#d81e06',
+      backgroundColor: '#333333',
+      borderStyle: 'black',
+      list: [{
+        pagePath: 'pages/index',
+        text: '广场',
+        iconPath: '/static/images/guangchang.png',
+        selectedIconPath: '/static/images/guangchang_sel.png'
+      }, {
+        pagePath: 'pages/post',
+        text: '发布',
+        iconPath: '/static/images/fabu.png',
+        selectedIconPath: '/static/images/fabu_sel.png'
+      }, {
+        pagePath: 'pages/index',
+        text: '我的',
+        iconPath: '/static/images/wode.png',
+        selectedIconPath: '/static/images/wode_sel.png'
+      }]
+    },
     debug: true
   }
 

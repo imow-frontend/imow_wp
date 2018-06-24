@@ -1,0 +1,57 @@
+<template>
+  <view class="nav">
+    <view class="top">
+    </view>
+    <view class="main">
+      <Icon class="normal" type="houtui"/>
+      <p class="title">
+        {{title}}
+      </p>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Icon from './Icon'
+export default class NavBar extends wepy.component {
+  components = {
+    Icon
+  };
+  props={
+    title: {
+      type: String,
+      default: '阿母工业'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.top {
+  height: 20rpx;
+  width: 100%;
+}
+.nav {
+  background-color: red;
+}
+.main {
+  height: 108rpx;
+  position: relative;
+  width: 100%;
+  display: flex;
+}
+.nav .title {
+  margin: auto;
+  font-size: 42rpx;
+  /* font-weight: bold; */
+  color:#ffffff
+}
+.icon-houtui {
+  color: #ffffff;
+  margin: auto;
+  position: absolute;
+  top: 33%;
+  left: 10px;
+}
+</style>

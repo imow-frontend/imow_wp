@@ -1,0 +1,40 @@
+<template>
+  <view style="{{line > 1 ? '-webkit-line-clamp:' + line + ' ;' : ''}}" class="{{showMore?'':'wxc-elip elip--multiple'}}">
+      <slot></slot>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Item extends wepy.component {
+    props = {
+      line: {
+        type: Number,
+        default: 3
+      }
+    };
+    data={
+      showMore: false
+    }
+    methods={
+      showMore() {
+        debugger
+        console.log('showMore')
+        this.showMore = !this.showMore
+      }
+    }
+  }
+</script>
+
+<style>
+  .wxc-elip {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .elip--multiple {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+  }
+</style>

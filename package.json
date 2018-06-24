@@ -11,9 +11,13 @@
   "author": "Bruce Xiong",
   "license": "ISC",
   "dependencies": {
-    "wepy": "^1.6.0",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.4.0",
+    "redux-promise": "^0.6.0",
+    "wepy": "^1.7.2",
     "wepy-async-function": "^1.4.4",
-    "wepy-com-toast": "^1.0.3"
+    "wepy-com-toast": "^1.0.3",
+    "wepy-redux": "^1.5.9"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.1",

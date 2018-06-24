@@ -1,0 +1,32 @@
+<style lang="scss">
+.list{
+  margin-top: 30rpx;
+  background-color: #ededed;
+}
+</style>
+<template>
+  <block>
+    <view class="list">
+      <repeat for="{{page.list}}" key="index" index="index" item="item">
+        <Item :item.sync="item"></Item>
+      </repeat>
+    </view>
+    <loadMore :page.sync="page" />
+  </block>
+</template>
+<script>
+  import wepy from 'wepy'
+  import loadMore from '../weui/loadmore'
+  import Item from './item'
+  export default class List extends wepy.component {
+    components = {
+      loadMore: loadMore,
+      Item
+    };
+    props = {
+      page: {
+        list: []
+      }
+    };
+  }
+</script>

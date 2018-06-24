@@ -1,0 +1,79 @@
+<template>
+ <view class="icon icon-{{ type }}" ></view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class Icon extends wepy.component {
+  props={
+    type: String
+  }
+}
+</script>
+
+<style lang="scss">
+@import "../static/styles/variable";
+
+@font-face {
+  font-family: 'iconfont';  /* project id 717791 */
+  src: url('//at.alicdn.com/t/font_717791_5kfz2poly6.eot');
+  src: url('//at.alicdn.com/t/font_717791_5kfz2poly6.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_717791_5kfz2poly6.woff') format('woff'),
+  url('//at.alicdn.com/t/font_717791_5kfz2poly6.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_717791_5kfz2poly6.svg#iconfont') format('svg');
+}
+@mixin icon-size($size){
+  line-height: $size;
+  font-size: $size;
+}
+
+.icon {
+  font-family:"iconfont" !important;
+  color: $color-primary;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rpx;
+}
+.icon.xxxlarge{@include icon-size(45px);}
+.icon.xxlarge{@include icon-size(40px);}
+.icon.xlarge{@include icon-size(35px);}
+.icon.large{@include icon-size(30px);}
+.icon.normal{@include icon-size(25px);}
+.icon.small{@include icon-size(20px);}
+.icon.xsmall{@include icon-size(15px);}
+
+.icon[color="primary"]{color: $color-primary}
+.icon[color="major"]{color: $color-major}
+.icon[color="white"]{color: white}
+.icon[color="gray"]{color: #8a8a8a}
+
+
+.icon-weixiu:before { content: "\e600"; }
+
+.icon-dingwei:before { content: "\e632"; }
+
+.icon-bohao:before { content: "\e603"; }
+
+.icon-qita:before { content: "\e6e5"; }
+
+.icon-houtui:before { content: "\e613"; }
+
+.icon-qiugou:before { content: "\e60f"; }
+
+.icon-yaomaiche:before { content: "\e61e"; }
+
+.icon-chakan:before { content: "\e642"; }
+
+.icon-shijian:before { content: "\e649"; }
+
+.icon-guanzhu:before { content: "\e61d"; }
+
+.icon-peijian:before { content: "\ea49"; }
+
+.icon-fenge:before { content: "\e681"; }
+
+</style>

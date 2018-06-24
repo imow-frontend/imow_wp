@@ -1,0 +1,143 @@
+<template>
+  <block>
+    <NavBar title="发布"/>
+    <view class="z-p">
+      <view class="panel-title">
+        <view class="htitle">
+          请选择分类
+        </view>
+        <view class="subTitle">
+          这样能让别人更快的看到你的产品哦！
+        </view>
+        </view>
+      <view class="btnWapper">
+        <view class="item">
+          <button class="y-btn el-button" bindtap="routeToLogisticsTypePost">
+                 <Icon1 type="yaomaiche xxxxlarge"/>
+              </button>
+          <view class="text">二手车</view>
+        </view>
+        <view class="pd item">
+          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+                 <Icon2 type="peijian xxxxlarge"/>
+              </button>
+               <view class="text">二手配件</view>
+        </view>
+        <view  class="item">
+          <button class="y-btn el-button" bindtap="routeToLogisticsTypePost">
+                 <Icon3 type="weixiu xxxxlarge"/>
+              </button>
+                <view class="text">找维修</view>
+        </view>
+        <view class="pd item">
+          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+                 <Icon4 type="qiugou xxxxlarge"/>
+              </button>
+                <view class="text">求购</view>
+        </view>
+        <view  class="item">
+          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+                 <Icon5 type="qita xxxxlarge"/>
+              </button>
+                <view class="text">其他</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import router from '../mixins/router'
+  import NavBar from '../components/NavBar'
+  import Icon from '../components/Icon'
+  export default class Post extends wepy.page {
+    mixins = [router];
+    components = {
+      NavBar,
+      Icon1: Icon,
+      Icon2: Icon,
+      Icon3: Icon,
+      Icon4: Icon,
+      Icon5: Icon,
+    };
+  }
+</script>
+
+<style lang="scss" scoped>
+.panel-title{
+  color:#ffffff;
+  text-align: center;
+  padding-top: 55rpx;
+  .htitle{
+ font-size:35rpx;
+ font-weight: bold;
+  }
+  .subTitle{
+    font-size:24rpx;
+    margin-top: 10rpx;
+  }
+}
+  .pd {
+    padding-left: 90rpx;
+  }
+  .z-p {
+    height: 100%;
+    content: '';
+    display: block;
+    background-color: #9aa099;
+  }
+  .btnWapper {
+    display: flex;
+    padding: 70rpx 130rpx;
+    flex-wrap: wrap;
+    .item {
+      text-align: center;
+      margin-bottom: 60rpx;
+    }
+    .text{
+      margin-top: 10rpx;
+      font-size:30rpx;
+      color:#ffffff;
+    }
+  }
+  .el-button.y-btn {
+    border-radius: 50%;
+    padding: 12px;
+    background-color: #ffffff;
+    height: 200rpx;
+    line-height: 200rpx;
+    width: 200rpx;
+    text-align: center;
+  }
+  .el-button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    border-color: #dcdfe6;
+    color: #606266;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+  .xxxxlarge {
+    color: #dd0b1a;
+    line-height: 105rpx;
+    font-size: 105rpx;
+    align-items: center;
+    vertical-align: baseline;
+  }
+</style>
