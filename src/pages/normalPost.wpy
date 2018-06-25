@@ -1,0 +1,183 @@
+<template>
+  <block>
+    <NavBar title="发布" />
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="zan-panel gp">
+        <titleField :options="form_title" componentId="form_title" />
+        <!-- ------------------------ 品牌 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">品牌</view>
+          <picker mode="selector" class="zan-field__input zan-cell__bd" range="{{brandRange}}" value="{{ dateTimeObj.timeFormat }}" bindchange="dateTimeChange" name="brand">
+            <view class="picker zan-field__input">
+              {{ dateTimeObj.time }}
+            </view>
+          </picker>
+        </view>
+        <tonnageField :options="form_tonnage" componentId="form_tonnage" />
+        <!-- ------------------------ 新旧程度 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">新旧程度</view>
+          <picker mode="selector" class="zan-field__input zan-cell__bd" range="{{newRange}}" value="{{ dateTimeObj.timeFormat }}" bindchange="dateTimeChange" name="new">
+            <view class="picker zan-field__input">
+              {{ dateTimeObj.time }}
+            </view>
+          </picker>
+        </view>
+        <!-- ------------------------ 所在地 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">所在地</view>
+          <picker mode="region" class="zan-field__input zan-cell__bd" bindchange="dateTimeChange" name="area">
+            <view class="picker zan-field__input">
+              {{ dateTimeObj.time }}
+            </view>
+          </picker>
+        </view>
+        <detailField :options="form_detail" componentId="form_detail" />
+      </view>
+      <view class="imageWapper">
+        <repeat for="{{files}}" key="index" index="index" item="file">
+          <view class="re">
+            <view class="weui-uploader__file" bindtap="previewImage" id="{{file}}">
+              <image class="weui-uploader__img" src="{{file}}" mode="aspectFill" />
+            </view>
+            <view class="removeBtn" bindtap="removeImage" data-src="{{file}}">
+              <Icon type="iconfontclose2 " class="normal" />
+            </view>
+          </view>
+        </repeat>
+        <view class="weui-uploader__input-box">
+          <view class="weui-uploader__input" bindtap="chooseImage"></view>
+        </view>
+      </view>
+      <view class="zan-btns">
+        <button class="zan-btn zan-btn--primary {{ posting?'zan-btn--loading':'' }}" formType="submit">立即发布</button>
+      </view>
+    </form>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import zanField from '../components/zanui/zan-field'
+  import base from '../mixins/base'
+  import input from '../mixins/input'
+  import NavBar from '../components/NavBar'
+  import Icon from '../components/Icon'
+  export default class PostNews extends wepy.page {
+    // onShow() {
+    //   base.injectionParas.call(this)
+    // }
+    data = {
+      brandRange: ['中立', '中北', '中国'],
+      newRange: ['八成新', '八五成新', '九成新', '全新'],
+      postType: 1,
+      form_detail: {
+        name: 'detail',
+        placeholder: '请填写产品的描述信息',
+        type: 'textarea'
+      },
+      form_title: {
+        name: 'title',
+        title: '标题'
+      },
+      form_brand: {
+        name: 'brand',
+        title: '品牌'
+      },
+      form_tonnage: {
+        name: 'tonnage',
+        title: '吨位'
+      },
+      form_new: {
+        name: 'new',
+        title: '新旧程度'
+      },
+      form_area: {
+        name: 'area',
+        title: '所在地'
+      },
+      files: []
+    };
+    components = {
+      detailField: zanField,
+      titleField: zanField,
+      brandField: zanField,
+      tonnageField: zanField,
+      newField: zanField,
+      areaField: zanField,
+      NavBar,
+      Icon
+    };
+    methods = {
+      previewImage: function(e) {
+        let that = this
+        wx.previewImage({
+          current: e.currentTarget.id, // 当前显示图片的http链接
+          urls: that.data.files // 需要预览的图片http链接列表
+        })
+      },
+      removeImage: function(e) {
+        let that = this
+        debugger
+        let src = e.currentTarget.dataset.src
+        that.files.splice(that.files.indexOf(src), 1)
+        that.$apply()
+      },
+      /**
+       * 上传图片
+       */
+      chooseImage() {
+        let that = this
+        wx.chooseImage({
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          success: function(res) {
+            // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+            res.tempFilePaths.map(function(item) {
+              that.files.push(item)
+            })
+            that.$apply()
+          }
+        })
+      },
+      /**
+       * 提交
+       */
+      async formSubmit() {}
+    };
+    mixins = [base, input];
+  }
+</script>
+
+<style lang="scss" scoped>
+  @import "../zanui/panel.scss";
+  @import "../zanui/btn.scss";
+  .gp {
+    border-bottom: 20rpx solid #e8e8e8;
+  }
+  .imageWapper {
+    display: flex;
+    padding: 30rpx 50rpx;
+    padding-right: 15rpx;
+    flex-wrap: wrap;
+    text-align: center
+  }
+  .re {
+    position: relative;
+  }
+  .removeBtn {
+    position: absolute;
+    left: 65px;
+    top: -10px;
+    .icon {
+      color: #4c4c4c;
+    }
+  }
+</style>
+<style>
+  @import "/weui/widget/weui-cell/weui-uploader.wxss";
+  .weui-uploader__file {
+    margin-right: 15px;
+    position: relative;
+  }
+</style>

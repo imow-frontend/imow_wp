@@ -1,7 +1,6 @@
 import base from './base'
 import auth from './auth'
 import wepy from 'wepy'
-import Tip from '../utils/Tips'
 import store from '../store/utils'
 
 export default class member extends base {

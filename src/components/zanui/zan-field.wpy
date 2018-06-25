@@ -60,7 +60,6 @@
       class="zan-cell__hd zan-field__title">{{ options.title }}</view>
     <textarea
       wx:if="{{ options.type === 'textarea' }}"
-      auto-height
       name="{{ options.name || componentId || '' }}"
       value="{{ options.value }}"
       placeholder="{{ options.placeholder }}"
@@ -69,7 +68,7 @@
       bindinput="handleZanFieldChange"
       bindfocus="handleZanFieldFocus"
       bindblur="handleZanFieldBlur"
-      data-component-id="{{ componentId || '' }}"></textarea>
+      data-component-id="{{ componentId || '' }}" style="height: 200rpx; "></textarea>
     <input
       wx:else
       type="{{ options.inputType || 'text' }}"

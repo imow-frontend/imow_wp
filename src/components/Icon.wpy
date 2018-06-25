@@ -16,11 +16,11 @@ export default class Icon extends wepy.component {
 
 @font-face {
   font-family: 'iconfont';  /* project id 717791 */
-  src: url('//at.alicdn.com/t/font_717791_5kfz2poly6.eot');
-  src: url('//at.alicdn.com/t/font_717791_5kfz2poly6.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_717791_5kfz2poly6.woff') format('woff'),
-  url('//at.alicdn.com/t/font_717791_5kfz2poly6.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_717791_5kfz2poly6.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_717791_yvrpeboxw6.eot');
+  src: url('//at.alicdn.com/t/font_717791_yvrpeboxw6.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_717791_yvrpeboxw6.woff') format('woff'),
+  url('//at.alicdn.com/t/font_717791_yvrpeboxw6.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_717791_yvrpeboxw6.svg#iconfont') format('svg');
 }
 @mixin icon-size($size){
   line-height: $size;
@@ -75,5 +75,7 @@ export default class Icon extends wepy.component {
 .icon-peijian:before { content: "\ea49"; }
 
 .icon-fenge:before { content: "\e681"; }
+
+.icon-iconfontclose2:before { content: "\e602"; }
 
 </style>

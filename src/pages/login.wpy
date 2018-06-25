@@ -1,0 +1,108 @@
+<template>
+  <block>
+    <NavBar title="登陆" />
+    <view class="top">
+         <Avatar src="http://dummyimage.com/70x70" class="avatar"/>
+    </view>
+    <view class="wapper">
+    <form bindsubmit="formSubmit" bindreset="formReset">
+        <logNamefield :options="form_loginName" componentId="form.logNamefield"></logNamefield>
+        <pwdfield :options="form_password" componentId="form.pwdfield" class="mpt"></pwdfield>
+        <view class="zan-btns">
+          <button class="zan-btn zan-btn--primary {{ posting?'zan-btn--loading':'' }}" formType="submit">登陆并绑定微信号</button>
+        </view>
+    </form>
+    </view>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import zanField from '../components/zanui/zan-field'
+  import base from '../mixins/base'
+  import input from '../mixins/input'
+  import router from '../mixins/router'
+  import memberApi from '../api/member'
+  import NavBar from '../components/NavBar'
+  import Avatar from '../components/share/avatar'
+  export default class Login extends wepy.page {
+    data = {
+      form_loginName: {
+        name: 'loginName',
+        placeholder: '输入阿母账号',
+        mode: 'wrapped'
+      },
+      form_password: {
+        name: 'password',
+        placeholder: '输入密码',
+        password: true,
+        mode: 'wrapped'
+      }
+    };
+    components = {
+      logNamefield: zanField,
+      pwdfield: zanField,
+      NavBar,
+      Avatar
+    };
+    methods = {
+      async formSubmit() {
+        let logNameVal = this.input['form.logNamefield']
+        let pwdVal = this.input['form.pwdfield']
+        const rules = [{
+          value: logNameVal,
+          method: 'required',
+          message: '账号不能为空'
+        },
+        {
+          value: logNameVal,
+          method: 'tel',
+          message: '手机号码不正确'
+        },
+        {
+          value: pwdVal,
+          method: 'required',
+          message: '请输入密码'
+        }
+        ]
+        if (!this.check(rules)) {
+          return false
+        }
+        if (!this.posting) {
+          this.posting = true
+          if (await memberApi.login(logNameVal, pwdVal)) {
+            this.routeToMember()
+          }
+          this.posting = false
+        }
+      }
+    };
+    mixins = [base, input, router];
+  }
+</script>
+
+<style lang="scss" scoped>
+  @import '../zanui/panel.scss';
+  @import '../zanui/btn.scss';
+  
+  .top{
+    height: 300rpx;
+    background-color: red;
+    display:flex;flex-direction:row;justify-content:center;align-items:center;
+  }
+  .avatar{
+    width: 175rpx;
+    height: 175rpx;
+    
+  }
+  .wapper{
+    margin-top: 50rpx;
+    padding: 10rpx 90rpx;
+  }
+  .mpt{
+    margin-top: 35rpx;
+  }
+  .zan-btns{
+    margin-top: 70rpx;
+  }
+</style>
