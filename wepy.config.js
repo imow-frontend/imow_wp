@@ -8,7 +8,7 @@ module.exports = {
     babel: {
       sourceMap: true,
       presets: ['es2015', 'stage-1'],
-      plugins: ['transform-export-extensions', 'syntax-export-extensions']
+      plugins: ['transform-export-extensions', 'syntax-export-extensions', 'transform-decorators-legacy']
     }
   }
 }

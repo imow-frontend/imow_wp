@@ -16,6 +16,7 @@
   import pagination from '../mixins/pagination'
   import base from '../mixins/base'
   import postRequire from '../api/postRequire'
+  import store from '../store/utils'
   export default class Index extends wepy.page {
     components = {
       SearchBar,
@@ -71,14 +72,9 @@
       }
     }
     async onLoad() {
+      await store.init()
       this.page = postRequire.page()
       await this.next(this.params)
-      // await store.init()
-      // this.page.list.map(function(item, index) {
-      //   if (item.detail.length > 80) {
-      //     item.detailSub = item.detail.substring(0, 80) + '...'
-      //   }
-      // })
     }
     mixins = [pagination, base];
   }

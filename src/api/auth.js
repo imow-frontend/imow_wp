@@ -10,6 +10,7 @@ export default class auth extends base {
    */
   static async login() {
     let userInfo = null
+
     let needLogin = true
     let thirdSession = this.getConfig('third_session')
     console.info(`[auth] third_session : ${thirdSession} `)
@@ -28,6 +29,8 @@ export default class auth extends base {
     let result = {}
     result.thirdSession = userInfo.thirdSession
     result.imowUser = userInfo.imowUser
+    result.infoName = userInfo.infoName
+    result.infoMobile = userInfo.infoMobile
     await this.setSession(userInfo.thirdSession)
     const userInfoRaw = await this.userInfo()
     result.nickName = userInfoRaw.userInfo.nickName
@@ -45,7 +48,7 @@ export default class auth extends base {
   static async doLogin() {
     console.info(`[auth] start login `)
     const { code } = await wepy.login()
-    const url = `${this.baseUrl}/api/wxlogin`
+    const url = `${this.baseUrl}/auth/userLogin`
     try {
       const result = await this.post(url, {loginCode: code})
       console.info(`[auth] login complete :${result.thirdSession} `)

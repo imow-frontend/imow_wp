@@ -8,18 +8,25 @@
 import wepy from 'wepy'
 import 'wepy-async-function'
 
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+import authApi from './api/auth'
+import Tips from './utils/Tips'
+
+const store = configStore()
+setStore(store)
+
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/normalPost',
       'pages/index',
-      'pages/post',
+      'pages/normalPost',
       'pages/login',
+      'pages/post',
     ],
     window: {
       'backgroundTextStyle': 'light',
       'navigationBarBackgroundColor': '#fff',
-      'navigationBarTitleText': '每天抽福利',
       'navigationBarTextStyle': 'black',
       'navigationStyle': 'custom'
     },
@@ -34,7 +41,7 @@ export default class extends wepy.app {
         iconPath: '/static/images/guangchang.png',
         selectedIconPath: '/static/images/guangchang_sel.png'
       }, {
-        pagePath: 'pages/post',
+        pagePath: 'pages/normalPost',
         text: '发布',
         iconPath: '/static/images/fabu.png',
         selectedIconPath: '/static/images/fabu_sel.png'
@@ -48,9 +55,84 @@ export default class extends wepy.app {
     debug: true
   }
 
-  constructor() {
+  globalData = {
+    auth: {
+      third_session: null
+    },
+    pageParams: {}
+  }
+
+  constructor () {
     super()
+    this.use('requestfix')
     this.use('promisify')
+    this.intercept('request', {
+      config (p) {
+        p.header = this.createAuthHeader()
+        return p
+      },
+
+      async success (p) {
+        // 切面统一处理网络请求的错误
+        if (p && p.data) {
+          if (p.data.status === 0) {
+            if (p.data.list && p.data.list.length > 0) {
+              p.data = p.data.list
+            }
+          } else if (p.data.status === 88) {
+            Tips.error((p.data.errorMag && p.data.errorMag) || '失败,请重试')
+            // 未登录
+          } else if (p.data.status === 110) {
+            const loginResult = await authApi.login()
+            if (loginResult.imowUser) {
+              Tips.error('服务器发生了一个错误,已修复,请重新提交!')
+            } else {
+              Tips.error('你没有绑定阿母账号,请前往登录页面登录!')
+            }
+          }
+        }
+        return p
+      },
+
+      fail (p) {
+        console.log('request fail: ', p)
+        return p
+      }
+    })
+    this.intercept('uploadFile', {
+      config (p) {
+        p.header = this.createAuthHeader()
+        return p
+      },
+      success (p) {
+        return p.data
+      }
+    })
+  }
+
+  createAuthHeader () {
+    const thridSession = authApi.getConfig('third_session')
+    const header = {}
+    if (thridSession) {
+      header['third_session'] = thridSession
+    }
+    return header
+  }
+
+  async onLaunch(param) {
+    this.syncStoreConfig('third_session')
+  }
+
+  syncStoreConfig(key) {
+    try {
+      const value = wepy.getStorageSync(key)
+      if (value !== '') {
+        console.info(`[auth]${key} sync success `)
+        wepy.$instance.globalData.auth[key] = value
+      }
+    } catch (e) {
+      console.warn(`[auth]${key} sync fail `)
+    }
   }
 }
 </script>

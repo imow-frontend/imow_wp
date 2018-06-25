@@ -73,7 +73,7 @@
       wx:else
       type="{{ options.inputType || 'text' }}"
       name="{{ options.name || componentId || '' }}"
-      value="{{ options.value }}"
+      value="{{ options.value ||_value }}"
       placeholder="{{ options.placeholder }}"
       class="zan-field__input zan-cell__bd {{ options.right ? 'zan-field__input--right' : '' }}"
       placeholder-class="zan-field__placeholder"
@@ -88,6 +88,7 @@ import wepy from 'wepy'
 
 export default class zanField extends wepy.component {
   props = {
+    _value: String,
     options: {
       type: Object,
       default: {
