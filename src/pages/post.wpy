@@ -12,31 +12,31 @@
         </view>
       <view class="btnWapper">
         <view class="item">
-          <button class="y-btn el-button" bindtap="routeToNormalPost">
+          <button class="y-btn el-button" bindtap="routePost" data-type="1">
                  <Icon1 type="yaomaiche xxxxlarge"/>
               </button>
           <view class="text">二手车</view>
         </view>
         <view class="pd item">
-          <button class="y-btn el-button" bindtap="routeToNormalPost">
+          <button class="y-btn el-button" bindtap="routePost" data-type="2">
                  <Icon2 type="peijian xxxxlarge"/>
               </button>
                <view class="text">二手配件</view>
         </view>
         <view  class="item">
-          <button class="y-btn el-button" bindtap="routeToNormalPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="3">
                  <Icon3 type="weixiu xxxxlarge"/>
               </button>
                 <view class="text">找维修</view>
         </view>
         <view class="pd item">
-          <button class="y-btn el-button" bindtap="routeToNormalPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="4">
                  <Icon4 type="qiugou xxxxlarge"/>
               </button>
                 <view class="text">求购</view>
         </view>
         <view  class="item">
-          <button class="y-btn el-button" bindtap="routeToNormalPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="5">
                  <Icon5 type="qita xxxxlarge"/>
               </button>
                 <view class="text">其他</view>
@@ -61,6 +61,13 @@
       Icon4: Icon,
       Icon5: Icon,
     };
+    methods={
+      routePost(e) {
+        var type = e.target.dataset.type
+        wepy.$instance.globalData.pageParams['pages/normalPost'] = {postType: type}
+        this.routeToNormalPost()
+      }
+    }
   }
 </script>
 

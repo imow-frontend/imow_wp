@@ -1,4 +1,4 @@
-import { SAVE } from '../types/user'
+import { SAVE, UPDATE_USERINFO } from '../types/user'
 import { createAction } from 'redux-actions'
 
 export const UpdateUserAction = createAction(SAVE, (user) => {
@@ -7,7 +7,14 @@ export const UpdateUserAction = createAction(SAVE, (user) => {
       key: 'user',
       value: user
     }
-  } else {
+  }
+})
 
+export const UpdateUserInfoAction = createAction(UPDATE_USERINFO, (userInfo) => {
+  if (userInfo) {
+    return {
+      key: 'userInfo',
+      value: userInfo
+    }
   }
 })

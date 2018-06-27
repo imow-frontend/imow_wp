@@ -74,7 +74,8 @@
             this.routeToMember()
           }
           this.posting = false
-        }
+          this.$apply()
+      }
       }
     };
     mixins = [base, input, router];

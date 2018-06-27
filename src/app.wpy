@@ -20,8 +20,8 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index',
-      'pages/editDetail',
       'pages/publicList',
+      'pages/editDetail',
       'pages/member',
       'pages/normalPost',
       'pages/login',
@@ -109,6 +109,13 @@ export default class extends wepy.app {
         return p
       },
       success (p) {
+
+        if (p.data.status === 0) {
+          return p.data.src
+        } else if (p.data.status === 88) {
+          Tips.error((p.data.errorMag && p.data.errorMag) || '失败,请重试')
+            // 未登录
+        }
         return p.data
       }
     })

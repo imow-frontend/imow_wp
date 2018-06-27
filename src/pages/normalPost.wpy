@@ -70,6 +70,7 @@
 import wepy from 'wepy'
 import zanField from '../components/zanui/zan-field'
 import base from '../mixins/base'
+import router from '../mixins/router'
 import input from '../mixins/input'
 import NavBar from '../components/NavBar'
 import Icon from '../components/Icon'
@@ -152,15 +153,17 @@ export default class PostNews extends wepy.page {
      * 提交
      */
     async formSubmit() {
+
       const title = this.input['form_title']
       const tonnage = this.input['form_tonnage']
-      const contactName = this.input['form_contactName']
-      const contactMobile = this.input['form_contactMobile']
+      const contactName = this.input['form_contactName'] || this.user.infoName
+      const contactMobile = this.input['form_contactMobile'] || this.user.infoMobile
       const brand = this.brand
       const _new = this._new
       const area = this.area
       const detail = this.input['form_detail']
       const files = this.files
+      const type = this.postType
       const rules = [
         {
           value: title,
@@ -225,7 +228,9 @@ export default class PostNews extends wepy.page {
       if (!this.posting) {
         Tips.loading('上传中..')
         this.posting = true
-        await postRequire.postData({
+        const fileResult = await postRequire.uploadImg(files)
+        let images = fileResult.join(',')
+        const data = await postRequire.add({
           title,
           tonnage,
           contactName,
@@ -233,10 +238,16 @@ export default class PostNews extends wepy.page {
           brand,
           new: _new,
           area,
-          detail
+          detail,
+          type,
+          images
         })
+        if (data.status === 0) {
+          Tips.success('已提交系统审核', 3000)
+        }
         Tips.loaded()
         this.posting = false
+        this.routeToPublicList()
       }
     },
     handleZanFieldChange(event) {
@@ -260,7 +271,7 @@ export default class PostNews extends wepy.page {
       return this.$emit('zanFieldChange', event)
     },
   };
-  mixins = [base, input];
+  mixins = [base, input, router];
   async onLoad() {
     await store.init()
     this.$apply()

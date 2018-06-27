@@ -84,7 +84,7 @@
                 发布时间 {{item.createTime}}
               </view>
               <view class="delBtn">
-                <button class="zan-btn zan-btn--primary zan-btn--mini" @tap="delItem">删除信息</button>
+                <button class="zan-btn zan-btn--primary zan-btn--mini" @tap="delItem" data-did="{{item.id}}">删除信息</button>
               </view>
             </view>
           </view>
@@ -107,6 +107,7 @@
   import loadMore from '../weui/loadmore'
   import Elip from '../share/elip'
   import Tips from '../../utils/Tips'
+  import postRequire from '../../api/postRequire'
 export default class PL extends wepy.component {
     components = {
       loadMore: loadMore,
@@ -119,9 +120,22 @@ export default class PL extends wepy.component {
       }
     };
     methods={
-      async delItem() {
+      async delItem(e) {
         try {
           await Tips.confirm('确认删除吗?')
+          const id = e.currentTarget.dataset.did
+          const data = await postRequire.remove(id)
+          if (data.status === 0) {
+            Tips.success('删除成功', 3000)
+            let newList = []
+            this.page.list.map(function(item) {
+              if (item.id !== id) {
+                newList.push(item)
+              }
+            })
+            this.page.list = newList
+            this.$apply()
+          }
         } catch (error) {
           return false
         }

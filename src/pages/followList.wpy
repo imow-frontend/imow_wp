@@ -52,7 +52,7 @@
     async onLoad() {
       Tips.loading('努力加载中')
       await store.init()
-      this.page = postRequire.page()
+      this.page = postRequire.followListPage()
       await this.next(this.params)
     }
     mixins = [pagination, base];

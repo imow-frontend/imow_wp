@@ -48,8 +48,8 @@ export default class PostNews extends wepy.page {
      * 提交
      */
     async formSubmit() {
-      const contactName = this.input['form_contactName']
-      const contactMobile = this.input['form_contactMobile']
+      const contactName = this.input['form_contactName'] || this.user.infoName
+      const contactMobile = this.input['form_contactMobile'] || this.user.infoMobile
       const rules = [
 
         {
@@ -74,12 +74,18 @@ export default class PostNews extends wepy.page {
       if (!this.posting) {
         Tips.loading('上传中..')
         this.posting = true
-        await postRequire.postData({
-          contactName,
-          contactMobile,
-        })
+        const data = await postRequire.addOrUpdateUserInfo(contactName, contactMobile)
+        debugger
+        if (data.status === 0) {
+          Tips.success('修改成功', 2000)
+          store.updateUser({
+            infoName: contactName,
+            infoMobile: contactMobile
+          })
+        }
         Tips.loaded()
         this.posting = false
+        this.$apply()
       }
     },
     handleZanFieldChange(event) {

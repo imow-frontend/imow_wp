@@ -80,6 +80,7 @@
       bindinput="handleZanFieldChange"
       bindfocus="handleZanFieldFocus"
       bindblur="handleZanFieldBlur"
+      password = "{{ options.password }}"
       data-component-id="{{ componentId || '' }}"/>
   </view>
 </template>

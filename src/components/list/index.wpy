@@ -33,7 +33,7 @@
         目前暂时没有数据！
       </view>
       <view class="fbBtn" wx:if="{{showBtn}}">
-        <button class="zan-btn zan-btn--primary">立即发布</button>
+        <button class="zan-btn zan-btn--primary" @tap="routeToPost">立即发布</button>
       </view>
     </block>
   </block>
@@ -42,11 +42,13 @@
   import wepy from 'wepy'
   import loadMore from '../weui/loadmore'
   import Item from './item'
+  import router from '../../mixins/router'
   export default class List extends wepy.component {
     components = {
       loadMore: loadMore,
       Item
     };
+    mixins = [router];
     props = {
       page: {
         list: []

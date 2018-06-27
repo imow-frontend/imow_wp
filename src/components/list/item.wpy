@@ -32,7 +32,7 @@
     </view>
     <view class="imgWapper">
       <repeat for="{{item.images}}" key="index" index="index" item="image">
-        <image src="{{image}}" lazy-load="true" @tap="previewImg" id="{{image}}"/>
+        <image src="{{image}}" lazy-load="true" @tap="previewImg" id="{{image}}" data-did="{{item.id}}"/>
       </repeat>
     </view>
     <view class="btnWapper">
@@ -48,7 +48,7 @@
         <text> {{item.count}}次</text>
           <FIcon type="fenge fr" />
       </view>
-      <view class="btnItem">
+      <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
         <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
          <text> {{item.isFollow?'取消关注':'关注'}}</text>
       </view>
@@ -59,6 +59,7 @@
   import wepy from 'wepy'
   import Avatar from '../share/avatar'
   import Icon from '../Icon'
+  import postRequire from '../../api/postRequire'
   export default class Item extends wepy.component {
     components = {
       Avatar,
@@ -74,6 +75,7 @@
         moreText: '',
         title: '',
         detail: '',
+        isFollow: false,
         user: {
           avatar: ''
         }
@@ -86,8 +88,19 @@
           current: e.currentTarget.id,
           urls: that.item.images
         })
-        // 增加浏览数
+        const id = e.currentTarget.dataset.did
+        postRequire.increateDemandCount(id)
+      // 增加浏览数
       },
+      HandelFollow: async function(e) {
+        const id = e.currentTarget.dataset.did
+        const data = this.item.isFollow ? await postRequire.removeFollow(id)
+      : await postRequire.addFollow(id)
+        if (data.status === 0) {
+          this.item.isFollow = !this.item.isFollow
+          this.$apply()
+        }
+      }
     }
   }
 </script>

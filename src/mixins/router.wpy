@@ -28,6 +28,14 @@ export default class router extends wepy.mixin {
     this.$root.$switch(`/pages/index`)
   }
 
+  routeToPost() {
+    this.$root.$switch(`/pages/post`)
+  }
+
+  routeToPublicList() {
+    wx.navigateTo({url: `/pages/publicList`})
+  }
+
    /**
    * 跳转到登录
    */
@@ -57,6 +65,9 @@ export default class router extends wepy.mixin {
   }
 
   methods = {
+    routeToPost() {
+      this.routeToPost()
+    },
     navigateBack() {
       this.navigateBack()
     },
@@ -65,6 +76,9 @@ export default class router extends wepy.mixin {
     },
     routeToMember() {
       this.routeToMember()
+    },
+    routeToPublicList() {
+      this.routeToPublicList()
     },
     routeToLogin() {
       this.routeToLogin()

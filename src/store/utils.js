@@ -27,6 +27,15 @@ const updateUser = user => {
   store.dispatch(UpdateUserAction(userForUpdate))
 }
 
+const updateUserInfo = userInfo => {
+  debugger
+  const store = getStore()
+  const state = store.getState()
+  const orignUser = state.userReducer['user']
+  const userForUpdate = Object.assign(orignUser, user)
+  store.dispatch(UpdateUserAction(userForUpdate))
+}
+
 const init = async () => {
   if (isLoading) {
     console.info('[store] store is loading, wait completed')
@@ -82,4 +91,4 @@ const updateMeta = (field) => {
   meta[field].updateTime = new Date().getTime()
 }
 
-export default {get, updateUser, init}
+export default {get, updateUser, updateUserInfo, init}

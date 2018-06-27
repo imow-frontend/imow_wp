@@ -1,4 +1,4 @@
-import {UpdateUserAction} from '../actions/index'
+import {UpdateUserAction, UpdateUserInfoAction} from '../actions/index'
 import { handleActions } from 'redux-actions'
 
 const defaultState = {
@@ -18,5 +18,14 @@ export default handleActions({
       ...state,
       [key]: value
     }
+  },
+  [UpdateUserInfoAction] (state, action) {
+    const {key, value} = action.payload
+    console.info(`[dispatch] save : ${key} value : ${value}`)
+    debugger
+    // return {
+    //   ...state,
+    //   [key]: value
+    // }
   }
 }, defaultState)
