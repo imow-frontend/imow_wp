@@ -1,29 +1,63 @@
-<style lang="scss">
-  @import "../../zanui/btn.scss";
-  .list {
-    margin-top: 30rpx;
-    background-color: #ededed;
-  }
-  .noMsg {
-    text-align: center;
-    margin-top: 100rpx;
-    font-size: 30rpx;
-  }
-  .fbBtn {
-    margin-top: 30rpx;
-    text-align: center;
-  }
-  .zan-btn {
-    display: inline-block;
-    width: 230rpx;
-  }
-</style>
+
 <template>
   <block>
     <block wx:if="{{page.list.length>0}}">
       <view class="list">
         <repeat for="{{page.list}}" key="index" index="index" item="item">
-          <Item :item.sync="item"></Item>
+          <view class="item">
+            <view class="up">
+              <view class="avatar">
+                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url({{item.user.avatar}}); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+              </view>
+              <view class="userInfo">
+                <view class="name">
+                  {{item.user.name}}
+                </view>
+                <view class="mid">
+                  <DIcon type="dingwei" /><label class="pd">{{item.area}}</label>
+                  <BIcon type="bohao" /><label>{{item.user.mobile}}</label>
+                </view>
+                <view class="bottom">
+                  <label class="pd">品牌:{{item.brand}}</label>
+                  <label class="pd">吨位:{{item.tonnage}}</label>
+                  <label class="pd">新旧程度:{{item.new}}</label>
+                </view>
+              </view>
+            </view>
+            <view class="dowm">
+              <view class="productInfo">
+                <view class="proName">
+                  <text>{{item.title}}</text>
+                </view>
+                <view class="detail">
+                  <text>{{item.detail}}</text>
+                </view>
+              </view>
+            </view>
+            <view class="imgWapper">
+              <repeat for="{{item.images}}" key="index" index="index" item="image">
+                <image src="{{image}}" lazy-load="true" @tap="previewImg" id="{{image}}" data-did="{{item.id}}" />
+              </repeat>
+            </view>
+            <view class="btnWapper">
+              <view class="btnItem">
+                <view>
+                  <TIcon type="shijian" />
+                  <text> {{item.createTime}}</text>
+                  <FIcon type="fenge fr" />
+                </view>
+              </view>
+              <view class="btnItem">
+                <CIcon type="chakan" />
+                <text> {{item.count}}次</text>
+                <FIcon type="fenge fr" />
+              </view>
+              <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
+                <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
+                <text> {{item.isFollow?'取消关注':'关注'}}</text>
+              </view>
+            </view>
+          </view>
         </repeat>
       </view>
       <loadMore :page.sync="page" />
@@ -41,12 +75,21 @@
 <script>
   import wepy from 'wepy'
   import loadMore from '../weui/loadmore'
-  import Item from './item'
+  // import Item from './item'
   import router from '../../mixins/router'
+  import Icon from '../Icon'
+  import Avatar from '../share/avatar'
+  import postRequire from '../../api/postRequire'
   export default class List extends wepy.component {
     components = {
       loadMore: loadMore,
-      Item
+      Avatar,
+      DIcon: Icon,
+      BIcon: Icon,
+      TIcon: Icon,
+      CIcon: Icon,
+      GIcon: Icon,
+      FIcon: Icon
     };
     mixins = [router];
     props = {
@@ -55,5 +98,184 @@
       },
       showBtn: true
     };
+    getItem(id) {
+      let result = null
+      this.page.list.map(function(item) {
+        if (item.id === id) {
+          result = item
+          return false
+        }
+      })
+      return result
+    }
+    methods = {
+      previewImg: function(e) {
+        let that = this
+        const id = e.currentTarget.dataset.did
+        wx.previewImage({
+          current: e.currentTarget.id,
+          urls: that.getItem(id).images
+        })
+        postRequire.increateDemandCount(id)
+        // 增加浏览数
+      },
+      HandelFollow: async function(e) {
+        const id = e.currentTarget.dataset.did
+        const data = this.getItem(id).isFollow ? await postRequire.removeFollow(id)
+        : await postRequire.addFollow(id)
+        if (data.status === 0) {
+          this.page.list.map(function(item) {
+            if (item.id === id) {
+              item.isFollow = !item.isFollow
+              return false
+            }
+          })
+          this.$apply()
+        }
+      }
+    }
   }
 </script>
+
+<style lang="scss">
+  @import "../../zanui/btn.scss";
+  .list {
+    margin-top: 30rpx;
+    background-color: #ededed;
+    .icon {
+      font-size: 20rpx;
+      line-height: 20rpx;
+      padding: 0rpx;
+      min-width: 0rpx;
+      width: auto;
+      color: #747474;
+      &.active {
+        color: #dd0a18;
+      }
+    }
+  }
+  .noMsg {
+    text-align: center;
+    margin-top: 100rpx;
+    font-size: 30rpx;
+  }
+  .fbBtn {
+    margin-top: 30rpx;
+    text-align: center;
+  }
+  .zan-btn {
+    display: inline-block;
+    width: 230rpx;
+  }
+  .item {
+    padding-left: 30rpx;
+    padding-right: 30rpx;
+    padding-bottom: 10rpx;
+    background-color: #ffffff;
+    margin-bottom: 20rpx;
+  }
+  .btnWapper {
+    display: flex;
+    border-top: 1px solid #e5e5e5;
+    .btnItem {
+      flex: 1;
+      color: #747474;
+      text-align: center;
+      text {
+        font-size: 20rpx;
+      }
+    }
+  }
+  .up {
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 30rpx;
+    display: flex;
+    padding-top: 30rpx;
+  }
+  .imgWapper {
+    margin-top: 22rpx;
+    display: flex;
+    flex-wrap: wrap;
+    image {
+      width: 210rpx;
+      height: 210rpx;
+      margin-left: 18rpx;
+      margin-bottom: 15rpx;
+    }
+  }
+  .productInfo {
+    flex: 1
+  }
+  .proName {
+    font-size: 28rpx;
+    font-weight: bold;
+  }
+  .detail {
+    text {
+      font-size: 23rpx;
+      margin-top: 10rpx;
+    }
+  }
+  .more {
+    text {
+      font-size: 18rpx;
+      color: #747474;
+    }
+    text-align: right;
+    margin-top: 10rpx;
+  }
+  .dowm {
+    display: flex; // width: 100%;
+    margin: 30rpx 20rpx;
+  }
+  .userInfo {
+    flex: 1;
+    margin-left: 20rpx;
+    padding: 25rpx;
+    color: #949494;
+    background-color: #f3f3f3;
+    border-radius: 10rpx;
+    view {
+      font-size: 20rpx;
+      color: #949494;
+    }
+    .pd {
+      padding-right: 27rpx;
+    }
+    label {
+      vertical-align: baseline;
+    }
+    .name {
+      font-size: 30rpx;
+      color: #444444;
+    }
+  }
+  .avatar {
+    display: inline-block;
+    position: relative;
+    width: 127rpx;
+    height: 127rpx;
+  }
+  .avatar__pic {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .avatar__mold--circle {
+    border-radius: 50%;
+  }
+  .avatar__badge {
+    position: absolute;
+    top: -8rpx;
+    right: -8rpx;
+    z-index: 1;
+  }
+  .fr {
+    float: right;
+    height: 40rpx;
+    line-height: 40rpx;
+  }
+</style>

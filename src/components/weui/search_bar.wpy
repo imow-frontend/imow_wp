@@ -12,19 +12,19 @@
           </block>
         </view>
         <label class="weui-search-bar__label" hidden="{{inputShowed}}" @tap="showInput(true)">
-          <icon class="weui-icon-search" type="search" size="14"></icon>
-          <view class="weui-search-bar__text">{{computedPlaceholder}}</view>
-        </label>
+                <icon class="weui-icon-search" type="search" size="14"></icon>
+                <view class="weui-search-bar__text">{{computedPlaceholder}}</view>
+              </label>
       </view>
       <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" @tap="search">搜索</view>
     </view>
-    <view wx:if="{{showHotSearch}}" class="hotSearch">电动搬运车 <span class="fg">|</span> 搬运堆高车 <span class="fg">|</span> 内燃叉车 <span class="fg">|</span> 手推车</view>
+    <view wx:if="{{showHotSearch}}" class="hotSearch"><text class="text" @tap="hotSearch" data-text="电动搬运车">电动搬运车</text> <span class="fg">|</span> <text class="text" @tap="hotSearch" data-text="搬运堆高车">搬运堆高车</text> <span class="fg">|</span> <text class="text" @tap="hotSearch" data-text="内燃叉车">内燃叉车</text>    <span class="fg">|</span>  <text class="text" @tap="hotSearch" data-text="手推车">手推车</text></view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-export default class SearchBar extends wepy.component {
+  export default class SearchBar extends wepy.component {
     props = {
       placeholder: {
         type: String,
@@ -45,12 +45,17 @@ export default class SearchBar extends wepy.component {
       }
     };
     methods = {
+      hotSearch(e) {
+        const keyWord = e.currentTarget.dataset.text
+        this.inputVal = keyWord
+        this.$apply()
+        this.methods.search.apply(this)
+      },
       showInput(isShow) {
         this.inputShowed = isShow === 'true'
         this.$apply()
       },
       search() {
-  
         const params = {
           key_word: this.inputVal
         }
@@ -70,16 +75,18 @@ export default class SearchBar extends wepy.component {
 </script>
 <style lang="css" scoped>
   @import "/weui/widget/weui-searchbar/weui-searchbar.wxss";
-  .wapper{
+  .wapper {
     background-image: url('http://pavr51yat.bkt.clouddn.com/ex_searchWapper-text');
   }
-  .hotSearch{
+  .hotSearch {
     margin-top: 20rpx;
     margin-left: 35rpx;
-    font-size:25rpx;
-    color:#ffffff
+    color: #ffffff;
   }
-  .fg{
+  .text {
+    font-size: 25rpx;
+  }
+  .fg {
     margin-left: 23rpx;
     margin-right: 23rpx;
   }

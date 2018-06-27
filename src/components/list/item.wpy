@@ -72,13 +72,7 @@
     };
     props = {
       item: {
-        moreText: '',
-        title: '',
-        detail: '',
-        isFollow: false,
-        user: {
-          avatar: ''
-        }
+        type: Object
       }
     };
     methods={
@@ -93,13 +87,17 @@
       // 增加浏览数
       },
       HandelFollow: async function(e) {
-        const id = e.currentTarget.dataset.did
-        const data = this.item.isFollow ? await postRequire.removeFollow(id)
-      : await postRequire.addFollow(id)
-        if (data.status === 0) {
-          this.item.isFollow = !this.item.isFollow
-          this.$apply()
-        }
+      //   const id = e.currentTarget.dataset.did
+      //   const data = this.item.isFollow ? await postRequire.removeFollow(id)
+      // : await postRequire.addFollow(id)
+      //   if (data.status === 0) {
+      //     this.item.isFollow = !this.item.isFollow
+      //     this.$apply()
+      //   }
+        debugger
+        this.props.item.isFollow = !this.props.item.isFollow
+  
+        this.$apply()
       }
     }
   }
