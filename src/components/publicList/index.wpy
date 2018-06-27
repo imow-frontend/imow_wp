@@ -126,7 +126,7 @@ export default class PL extends wepy.component {
           const id = e.currentTarget.dataset.did
           const data = await postRequire.remove(id)
           if (data.status === 0) {
-            Tips.success('删除成功', 3000)
+            Tips.success('删除成功', 2000)
             let newList = []
             this.page.list.map(function(item) {
               if (item.id !== id) {

@@ -29,7 +29,7 @@
       showHotSearch: false,
       params: () => {
         return {
-          type: 0,
+          type: '0',
           keyWord: this.keyWord
         }
       },
@@ -70,9 +70,12 @@
       }
     };
     events = {
-      zanTabChange(selectedId, event) {
-        this.tabData.selectedId = selectedId
-        this.$apply()
+      async zanTabChange(selectedId, event) {
+        if (this.type !== selectedId) {
+          this.type = selectedId
+          this.page.reset()
+          await this.next()
+        }
       },
       async search(params) {
         debugger
