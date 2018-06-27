@@ -1,17 +1,41 @@
 <style lang="scss">
-.list{
-  margin-top: 30rpx;
-  background-color: #ededed;
-}
+  @import "../../zanui/btn.scss";
+  .list {
+    margin-top: 30rpx;
+    background-color: #ededed;
+  }
+  .noMsg {
+    text-align: center;
+    margin-top: 100rpx;
+    font-size: 30rpx;
+  }
+  .fbBtn {
+    margin-top: 30rpx;
+    text-align: center;
+  }
+  .zan-btn {
+    display: inline-block;
+    width: 230rpx;
+  }
 </style>
 <template>
   <block>
-    <view class="list">
-      <repeat for="{{page.list}}" key="index" index="index" item="item">
-        <Item :item.sync="item"></Item>
-      </repeat>
-    </view>
-    <loadMore :page.sync="page" />
+    <block wx:if="{{page.list.length>0}}">
+      <view class="list">
+        <repeat for="{{page.list}}" key="index" index="index" item="item">
+          <Item :item.sync="item"></Item>
+        </repeat>
+      </view>
+      <loadMore :page.sync="page" />
+    </block>
+    <block wx:else>
+      <view class="noMsg">
+        目前暂时没有数据！
+      </view>
+      <view class="fbBtn" wx:if="{{showBtn}}">
+        <button class="zan-btn zan-btn--primary">立即发布</button>
+      </view>
+    </block>
   </block>
 </template>
 <script>
@@ -26,7 +50,8 @@
     props = {
       page: {
         list: []
-      }
+      },
+      showBtn: true
     };
   }
 </script>

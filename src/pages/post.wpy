@@ -12,31 +12,31 @@
         </view>
       <view class="btnWapper">
         <view class="item">
-          <button class="y-btn el-button" bindtap="routeToLogisticsTypePost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost">
                  <Icon1 type="yaomaiche xxxxlarge"/>
               </button>
           <view class="text">二手车</view>
         </view>
         <view class="pd item">
-          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost">
                  <Icon2 type="peijian xxxxlarge"/>
               </button>
                <view class="text">二手配件</view>
         </view>
         <view  class="item">
-          <button class="y-btn el-button" bindtap="routeToLogisticsTypePost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost">
                  <Icon3 type="weixiu xxxxlarge"/>
               </button>
                 <view class="text">找维修</view>
         </view>
         <view class="pd item">
-          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost">
                  <Icon4 type="qiugou xxxxlarge"/>
               </button>
                 <view class="text">求购</view>
         </view>
         <view  class="item">
-          <button class="y-btn el-button" bindtap="routeToFindCargoPost">
+          <button class="y-btn el-button" bindtap="routeToNormalPost">
                  <Icon5 type="qita xxxxlarge"/>
               </button>
                 <view class="text">其他</view>

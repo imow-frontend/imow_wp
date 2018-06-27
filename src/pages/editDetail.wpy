@@ -1,0 +1,131 @@
+<template>
+  <block>
+    <NavBar title="修改个人信息" />
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="zan-panel gp">
+        <!-- ------------------------ 联系人 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">联系人</view>
+          <input type="text" name="contactName" value="{{user.infoName}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactName" bindinput="handleZanFieldChange"/>
+        </view>
+        <!-- ------------------------ 联系电话 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">联系电话</view>
+          <input type="number" name="contactMobile" value="{{user.infoMobile}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange"/>
+        </view>
+      </view>
+      <view class="zan-btns">
+        <button class="zan-btn zan-btn--primary {{ posting?'zan-btn--loading':'' }}" formType="submit">修改</button>
+      </view>
+    </form>
+  </block>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../mixins/base'
+import input from '../mixins/input'
+import store from '../store/utils'
+import zanField from '../components/zanui/zan-field'
+import { connect } from 'wepy-redux'
+import Tips from '../utils/Tips'
+import NavBar from '../components/NavBar'
+import postRequire from '../api/postRequire'
+
+@connect({
+  user: store.get('user')
+})
+export default class PostNews extends wepy.page {
+  data = {
+    posting: false,
+  };
+  components = {
+    NavBar,
+    zanField
+  };
+  methods = {
+    /**
+     * 提交
+     */
+    async formSubmit() {
+      const contactName = this.input['form_contactName']
+      const contactMobile = this.input['form_contactMobile']
+      const rules = [
+
+        {
+          value: contactName,
+          method: 'required',
+          message: '请输入联系人!'
+        },
+        {
+          value: contactMobile,
+          method: 'required',
+          message: '输入正确的电话!'
+        },
+        {
+          value: contactMobile,
+          method: 'tel',
+          message: '输入正确的电话!'
+        },
+      ]
+      if (!this.check(rules)) {
+        return false
+      }
+      if (!this.posting) {
+        Tips.loading('上传中..')
+        this.posting = true
+        await postRequire.postData({
+          contactName,
+          contactMobile,
+        })
+        Tips.loaded()
+        this.posting = false
+      }
+    },
+    handleZanFieldChange(event) {
+      event.componentId = event.currentTarget.dataset.componentId
+      console.info('[zan:field:change]', event)
+
+      return this.$emit('zanFieldChange', event)
+    },
+  };
+  mixins = [base, input];
+  async onLoad() {
+    await store.init()
+    this.$apply()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import "../zanui/panel.scss";
+@import "../zanui/btn.scss";
+.gp {
+  border-bottom: 20rpx solid #e8e8e8;
+}
+.imageWapper {
+  display: flex;
+  padding: 30rpx 50rpx;
+  padding-right: 15rpx;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.re {
+  position: relative;
+}
+.removeBtn {
+  position: absolute;
+  left: 65px;
+  top: -10px;
+  .icon {
+    color: #4c4c4c;
+  }
+}
+</style>
+<style>
+@import "/weui/widget/weui-cell/weui-uploader.wxss";
+.weui-uploader__file {
+  margin-right: 15px;
+  position: relative;
+}
+</style>

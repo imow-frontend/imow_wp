@@ -1,9 +1,8 @@
 <template>
   <view>
-    <NavBar />
-    <SearchBar showHotSearch="{{showHotSearch}}"/>
-    <Tab :tab.sync="tabData" componentId="Tab"></Tab>
-    <List :page.sync="page" showBtn="true"  wx:if="{{init}}"/>
+    <NavBar title="关注列表" />
+    <SearchBar :showHotSearch="showHotSearch" />
+    <List :page.sync="page" :showBtn="showBtn" wx:if="{{init}}" />
   </view>
 </template>
 
@@ -12,24 +11,23 @@
   import NavBar from '../components/NavBar'
   import SearchBar from '../components/weui/search_bar'
   import List from '../components/list/index'
-  import Tab from '../components/zanui/zan-tab'
   import pagination from '../mixins/pagination'
   import base from '../mixins/base'
   import postRequire from '../api/postRequire'
   import store from '../store/utils'
   import Tips from '../utils/Tips'
-  export default class Index extends wepy.page {
+
+  export default class FollowList extends wepy.page {
     components = {
       SearchBar,
       NavBar,
-      Tab,
       List
     };
     data = {
       showHotSearch: false,
+      showBtn: false,
       params: () => {
         return {
-          type: 0,
           keyWord: this.keyWord
         }
       },
@@ -37,36 +35,6 @@
       keyWord: '',
       page: {
         list: []
-      },
-      tabData: {
-        selectedId: '0',
-        scroll: true,
-        height: 80,
-        list: [{
-          title: '全部',
-          id: '0'
-        },
-        {
-          title: '二手车',
-          id: '1'
-        },
-        {
-          title: '二手配件',
-          id: '2'
-        },
-        {
-          title: '找维修',
-          id: '3'
-        },
-        {
-          title: '求购',
-          id: '4'
-        },
-        {
-          title: '其他',
-          id: '5'
-        }
-        ]
       }
     };
     events = {
@@ -75,18 +43,17 @@
         this.$apply()
       },
       async search(params) {
-        debugger
         this.keyWord = params.key_word
         this.page.reset()
         await this.next()
+        this.$apply()
       }
-    }
+    };
     async onLoad() {
       Tips.loading('努力加载中')
       await store.init()
       this.page = postRequire.page()
       await this.next(this.params)
-      Tips.loaded()
     }
     mixins = [pagination, base];
   }

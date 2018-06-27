@@ -13,13 +13,14 @@
         <!-- ------------------------ 联系电话 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">联系电话</view>
-          <input type="text" name="contactMobile" value="{{user.infoMobile}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange"/>
+          <input type="number" name="contactMobile" value="{{user.infoMobile}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange"/>
         </view>
         <!-- ------------------------ 品牌 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">品牌</view>
           <picker mode="selector" class="zan-field__input zan-cell__bd" range="{{brandRange}}" bindchange="handleZanFieldChange" data-component-id="form_brand">
             <view class="picker zan-field__input">
+              {{brand}}
             </view>
           </picker>
         </view>
@@ -28,6 +29,7 @@
           <view class="zan-cell__hd zan-field__title">新旧程度</view>
           <picker mode="selector" class="zan-field__input zan-cell__bd" range="{{newRange}}" bindchange="handleZanFieldChange" data-component-id="form_new">
             <view class="picker zan-field__input">
+              {{_new}}
             </view>
           </picker>
         </view>
@@ -36,6 +38,7 @@
           <view class="zan-cell__hd zan-field__title">所在地</view>
           <picker mode="region" class="zan-field__input zan-cell__bd" bindchange="handleZanFieldChange" data-component-id="form_area">
             <view class="picker zan-field__input">
+              {{area}}
             </view>
           </picker>
         </view>
@@ -72,14 +75,20 @@ import NavBar from '../components/NavBar'
 import Icon from '../components/Icon'
 import store from '../store/utils'
 import { connect } from 'wepy-redux'
+import Tips from '../utils/Tips'
+import postRequire from '../api/postRequire'
 
 @connect({
   user: store.get('user')
 })
 export default class PostNews extends wepy.page {
   data = {
+    posting: false,
     brandRange: ['中立', '中北', '中国'],
     newRange: ['八成新', '八五成新', '九成新', '全新'],
+    brand: '',
+    _new: '',
+    area: '',
     postType: 1,
     form_detail: {
       name: 'detail',
@@ -143,9 +152,108 @@ export default class PostNews extends wepy.page {
      * 提交
      */
     async formSubmit() {
+      const title = this.input['form_title']
+      const tonnage = this.input['form_tonnage']
+      const contactName = this.input['form_contactName']
+      const contactMobile = this.input['form_contactMobile']
+      const brand = this.brand
+      const _new = this._new
+      const area = this.area
+      const detail = this.input['form_detail']
+      const files = this.files
+      const rules = [
+        {
+          value: title,
+          method: 'required',
+          message: '请输入标题!'
+        },
+        {
+          value: tonnage,
+          method: 'required',
+          message: '请输入吨位!'
+        },
+        {
+          value: contactName,
+          method: 'required',
+          message: '请输入联系人!'
+        },
+        {
+          value: contactMobile,
+          method: 'required',
+          message: '输入正确的电话!'
+        },
+        {
+          value: contactMobile,
+          method: 'tel',
+          message: '输入正确的电话!'
+        },
+        {
+          value: brand,
+          method: 'required',
+          message: '清选择品牌!'
+        },
+        {
+          value: _new,
+          method: 'required',
+          message: '请选择成新!'
+        },
+        {
+          value: area,
+          method: 'required',
+          message: '请选择地区!'
+        },
+        {
+          value: detail,
+          method: 'required',
+          message: '请输入描述信息!'
+        },
+        {
+          value: files,
+          method: 'required',
+          message: '请上传图片!'
+        },
+        {
+          value: files,
+          method: 'rangelength',
+          message: '上传1到10个图片',
+          param: [0, 10]
+        }
+      ]
+      if (!this.check(rules)) {
+        return false
+      }
+      if (!this.posting) {
+        Tips.loading('上传中..')
+        this.posting = true
+        await postRequire.postData({
+          title,
+          tonnage,
+          contactName,
+          contactMobile,
+          brand,
+          new: _new,
+          area,
+          detail
+        })
+        Tips.loaded()
+        this.posting = false
+      }
     },
     handleZanFieldChange(event) {
       event.componentId = event.currentTarget.dataset.componentId
+      switch (event.componentId) {
+      case 'form_brand':
+        this.brand = this.brandRange[event.detail.value]
+        break
+      case 'form_new':
+        this._new = this.newRange[event.detail.value]
+        break
+      case 'form_area':
+        this.area = event.detail.value
+        break
+      default:
+        break
+      }
 
       console.info('[zan:field:change]', event)
 
@@ -156,6 +264,9 @@ export default class PostNews extends wepy.page {
   async onLoad() {
     await store.init()
     this.$apply()
+  }
+  onShow() {
+    base.injectionParas.call(this)
   }
 }
 </script>

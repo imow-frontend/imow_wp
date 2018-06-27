@@ -36,20 +36,13 @@ export default class router extends wepy.mixin {
     wx.navigateTo({url: `/pages/login`})
   }
 
-  /**
-   * 跳转到注册
-   */
-  routeToRegister() {
-    wx.redirectTo({url: `/pages/register`})
-  }
-
   redirectToLogin() {
     // 登录跳转不关闭当前页面,只做一个单纯的跳转，在登录也返回上一级
     wx.redirectTo({url: `/pages/login`})
   }
 
-  routeToLogisticsTypePost() {
-    wx.navigateTo({url: `/pages/postLogisticsType`})
+  routeToNormalPost() {
+    wx.navigateTo({url: `/pages/normalPost`})
   }
 
   routeToFindCargoPost() {
@@ -63,11 +56,10 @@ export default class router extends wepy.mixin {
     wx.navigateTo({url: `/pages/postLogistics`})
   }
 
-  routeTopostNews() {
-    wx.navigateTo({url: `/pages/postNews`})
-  }
-
   methods = {
+    navigateBack() {
+      this.navigateBack()
+    },
     routeToIndex() {
       this.routeToIndex()
     },
@@ -77,20 +69,8 @@ export default class router extends wepy.mixin {
     routeToLogin() {
       this.routeToLogin()
     },
-    routeToRegister() {
-      this.routeToRegister()
-    },
-    routeToFindCargoPost() {
-      this.routeToFindCargoPost()
-    },
-    routeToFindTruckPost() {
-      this.routeToFindTruckPost()
-    },
-    routeToLogisticsTypePost() {
-      this.routeToLogisticsTypePost()
-    },
-    routeTopostNews() {
-      this.routeTopostNews()
+    routeToNormalPost() {
+      this.routeToNormalPost()
     },
     redirectToLogin() {
       this.redirectToLogin()

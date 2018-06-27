@@ -3,7 +3,7 @@ import Page from '../utils/Page'
 
 export default class postRequire extends base {
   static async postData(requireData = {}) {
-    const url = `${this.baseUrl}/Demand/getList`
+    const url = `${this.baseUrl}/Demand/Add`
     const result = await this.post(url, requireData)
     return result
   }

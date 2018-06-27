@@ -28,7 +28,7 @@ export default class input extends wepy.mixin {
   check(rules) {
     for (let rule of rules) {
       const value = rule.value
-      if (rule.method !== 'noDuplicate' && Lang.isArray(value)) {
+      if (rule.method !== 'noDuplicate' && rule.checkArray && Lang.isArray(value)) {
         // 数组校验每个值
         for (let innerValue of value) {
           const isValid = this.execCheck(rule, innerValue)

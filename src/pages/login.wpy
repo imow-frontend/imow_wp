@@ -89,6 +89,7 @@
     height: 300rpx;
     background-color: red;
     display:flex;flex-direction:row;justify-content:center;align-items:center;
+      background-image: url('http://pavr51yat.bkt.clouddn.com/ex_searchWapper-text');
   }
   .avatar{
     width: 175rpx;

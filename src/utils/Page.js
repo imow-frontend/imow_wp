@@ -58,7 +58,7 @@ export default class Pagination {
         this.list = data
         this.toClear = false
       } else {
-        this.list = this.list.concat(data.list)
+        this.list = this.list.concat(data)
       }
       this.start += this.count
       if (data.length < this.count) {

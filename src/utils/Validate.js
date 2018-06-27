@@ -101,6 +101,7 @@ export default class Validate {
    * 验证一个长度范围[min, max]
    */
   static rangelength(value, param) {
+    debugger
     return this.optional(value) || (value.length >= param[0] && value.length <= param[1])
   }
   /**

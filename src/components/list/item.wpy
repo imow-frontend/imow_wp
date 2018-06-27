@@ -32,7 +32,7 @@
     </view>
     <view class="imgWapper">
       <repeat for="{{item.images}}" key="index" index="index" item="image">
-        <image src="{{image}}" lazy-load="true" />
+        <image src="{{image}}" lazy-load="true" @tap="previewImg" id="{{image}}"/>
       </repeat>
     </view>
     <view class="btnWapper">
@@ -79,6 +79,16 @@
         }
       }
     };
+    methods={
+      previewImg: function(e) {
+        let that = this
+        wx.previewImage({
+          current: e.currentTarget.id,
+          urls: that.item.images
+        })
+        // 增加浏览数
+      },
+    }
   }
 </script>
 

@@ -1,0 +1,128 @@
+<template>
+  <block>
+    <NavBar title="个人中心" />
+    <view class="top clearfix">
+      <view class="left">
+        <view class="name">{{user.nickName}}</view>
+        <block wx:if="{{user.nickName&&!user.imowUser}}">
+          <navigator url="/pages/login">
+            <button class="zan-btn zan-btn--primary zan-btn--mini">登陆并绑定微信号</button>
+          </navigator>
+        </block>
+      </view>
+      <view class="right">
+        <Avatar class="avatar" />
+      </view>
+    </view>
+    <view class="mian">
+      <navigator url="/pages/publicList">
+        <view class="cell-class zan-cell">
+          <view class="zan-cell__bd">
+            <view class="zan-cell__text">我的发布</view>
+          </view>
+          <view class="zan-cell__ft">
+            <fbIcon type="fabu" class="xxlarge gary" />
+          </view>
+        </view>
+      </navigator>
+      <navigator url="/pages/followList">
+        <view class="cell-class zan-cell">
+          <view class="zan-cell__bd">
+            <view class="zan-cell__text">我的关注</view>
+          </view>
+          <view class="zan-cell__ft">
+            <gzIcon type="guanzhu1" class="xlarge gary" />
+          </view>
+        </view>
+      </navigator>
+      <navigator url="/pages/editDetail">
+        <view class="cell-class zan-cell">
+          <view class="zan-cell__bd">
+            <view class="zan-cell__text">我的资料</view>
+          </view>
+          <view class="zan-cell__ft">
+            <zIcon type="ziliao" class="xlarge gary" />
+          </view>
+        </view>
+      </navigator>
+    </view>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import router from '../mixins/router'
+  import NavBar from '../components/NavBar'
+  import Avatar from '../components/share/avatar'
+  import Icon from '../components/Icon'
+  import {
+    connect
+  } from 'wepy-redux'
+  import store from '../store/utils'
+  @connect({
+    user: store.get('user')
+  })
+  export default class Member extends wepy.page {
+    data = {};
+    components = {
+      NavBar,
+      Avatar,
+      fbIcon: Icon,
+      gzIcon: Icon,
+      zIcon: Icon
+    };
+    methods = {};
+    async onLoad() {
+      await store.init()
+      this.$apply()
+    }
+    mixins = [router];
+  }
+</script>
+
+<style lang="scss" scoped>
+  @import '../zanui/btn.scss';
+  @import '../zanui/cell.scss';
+  .zan-btn--small {
+    border-radius: 10rpx;
+  }
+  .mian {
+    padding: 10rpx 50rpx;
+    .zan-cell__text {
+      font-size: 30rpx;
+    }
+    .cell-class {
+      border-bottom: 1px solid #e8e8e8;
+      padding: 36rpx 0px;
+    }
+  }
+  .zan-btn--mini {
+    border-radius: 10rpx;
+    margin-top: 5rpx;
+  }
+  .clearfix {
+    overflow: auto;
+    zoom: 1;
+  }
+  .top {
+    padding: 60rpx 60rpx;
+    border-bottom: 30rpx solid #e8e8e8;
+    .name {
+      font-size: 36rpx;
+    }
+    .left {
+      margin-top: 15rpx;
+      float: left;
+    }
+    .right {
+      float: right;
+    }
+    .avatar {
+      width: 120rpx;
+      height: 120rpx;
+    }
+  }
+  .gary {
+    color: #747474
+  }
+</style>

@@ -1,13 +1,19 @@
 <template>
   <view class="avatar">
-    <block wx:if="{{src}}">
-      <view class="avatar__pic avatar__mold--{{mold}}" style="background-image: url({{src}}); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+    <block wx:if="{{user.avatarUrl}}">
+      <view class="avatar__pic avatar__mold--{{mold}}" style="background-image: url({{user.avatarUrl}}); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
     </block>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  import store from '../../store/utils'
+  @connect({
+    user: store.get('user')
+  })
+
   export default class Avatar extends wepy.component {
     props = {
       src: String,
@@ -16,6 +22,10 @@
         default: 'circle'
       }
     };
+    async onLoad() {
+      await store.init()
+      this.$apply()
+    }
   }
 </script>
 

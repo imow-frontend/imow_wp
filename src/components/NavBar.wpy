@@ -3,7 +3,9 @@
     <view class="top">
     </view>
     <view class="main">
-      <Icon class="normal" type="houtui"/>
+      <view @tap="navigateBack" wx:if="{{showNavigateBack}}">
+        <Icon class="normal" type="houtui" />
+      </view>
       <p class="title">
         {{title}}
       </p>
@@ -12,46 +14,59 @@
 </template>
 
 <script>
-import wepy from 'wepy'
-import Icon from './Icon'
-export default class NavBar extends wepy.component {
-  components = {
-    Icon
-  };
-  props={
-    title: {
-      type: String,
-      default: '阿母工业'
+  import wepy from 'wepy'
+  import Icon from './Icon'
+  import router from '../mixins/router'
+  export default class NavBar extends wepy.component {
+    mixins = [router];
+    components = {
+      Icon
+    };
+    props = {
+      title: {
+        type: String,
+        default: '阿母工业'
+      }
+    };
+    computed={
+      showNavigateBack() {
+        var pages = getCurrentPages()
+
+        var currentPage = pages[pages.length - 1]
+
+        var url = currentPage.route
+        return url !== 'pages/index' && url !== 'pages/post' && url !== 'pages/member'
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-.top {
-  height: 20rpx;
-  width: 100%;
-}
-.nav {
-  background-color: red;
-}
-.main {
-  height: 108rpx;
-  position: relative;
-  width: 100%;
-  display: flex;
-}
-.nav .title {
-  margin: auto;
-  font-size: 42rpx;
-  /* font-weight: bold; */
-  color:#ffffff
-}
-.icon-houtui {
-  color: #ffffff;
-  margin: auto;
-  position: absolute;
-  top: 33%;
-  left: 10px;
-}
+  .top {
+    height: 20rpx;
+    width: 100%;
+  }
+  .nav {
+    /* background-color: red; */
+    background-image: url('http://pavr51yat.bkt.clouddn.com/wx_NavTop.jpg-text')
+  }
+  .main {
+    height: 108rpx;
+    position: relative;
+    width: 100%;
+    display: flex;
+  }
+  .nav .title {
+    margin: auto;
+    font-size: 42rpx;
+    /* font-weight: bold; */
+    color: #ffffff
+  }
+  .icon-houtui {
+    color: #ffffff;
+    margin: auto;
+    position: absolute;
+    top: 33%;
+    left: 10px;
+  }
 </style>

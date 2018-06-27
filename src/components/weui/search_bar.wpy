@@ -1,5 +1,5 @@
 <template>
-  <view class="wapper">
+  <view class="wapper" style="height:{{showHotSearch?'202rpx':'102rpx'}}">
     <view class="weui-search-bar">
       <view class="weui-search-bar__form">
         <view class="weui-search-bar__box">
@@ -18,7 +18,7 @@
       </view>
       <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" @tap="search">搜索</view>
     </view>
-    <view class="hotSearch">电动搬运车 <span class="fg">|</span> 搬运堆高车 <span class="fg">|</span> 内燃叉车 <span class="fg">|</span> 手推车</view>
+    <view wx:if="{{showHotSearch}}" class="hotSearch">电动搬运车 <span class="fg">|</span> 搬运堆高车 <span class="fg">|</span> 内燃叉车 <span class="fg">|</span> 手推车</view>
   </view>
 </template>
 
@@ -29,6 +29,10 @@ export default class SearchBar extends wepy.component {
       placeholder: {
         type: String,
         default: '搜索你想要的信息.....'
+      },
+      showHotSearch: {
+        type: Boolean,
+        default: true
       }
     };
     data = {
@@ -46,12 +50,11 @@ export default class SearchBar extends wepy.component {
         this.$apply()
       },
       search() {
+  
         const params = {
-          key_word: this.inputVal || this.placeholder
+          key_word: this.inputVal
         }
-        wx.navigateTo({
-          url: `/pages/main/list?params=${JSON.stringify(params)}`
-        })
+        return this.$emit('search', params)
       },
       clearInput(cb) {
         setTimeout(() => {
@@ -68,8 +71,7 @@ export default class SearchBar extends wepy.component {
 <style lang="css" scoped>
   @import "/weui/widget/weui-searchbar/weui-searchbar.wxss";
   .wapper{
-    background-color: red;
-    height:202rpx ;
+    background-image: url('http://pavr51yat.bkt.clouddn.com/ex_searchWapper-text');
   }
   .hotSearch{
     margin-top: 20rpx;

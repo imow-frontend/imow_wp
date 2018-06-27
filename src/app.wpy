@@ -20,9 +20,13 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index',
+      'pages/editDetail',
+      'pages/publicList',
+      'pages/member',
       'pages/normalPost',
       'pages/login',
       'pages/post',
+      'pages/followList'
     ],
     window: {
       'backgroundTextStyle': 'light',
@@ -41,12 +45,12 @@ export default class extends wepy.app {
         iconPath: '/static/images/guangchang.png',
         selectedIconPath: '/static/images/guangchang_sel.png'
       }, {
-        pagePath: 'pages/normalPost',
+        pagePath: 'pages/post',
         text: '发布',
         iconPath: '/static/images/fabu.png',
         selectedIconPath: '/static/images/fabu_sel.png'
       }, {
-        pagePath: 'pages/login',
+        pagePath: 'pages/member',
         text: '我的',
         iconPath: '/static/images/wode.png',
         selectedIconPath: '/static/images/wode_sel.png'
@@ -76,7 +80,7 @@ export default class extends wepy.app {
         // 切面统一处理网络请求的错误
         if (p && p.data) {
           if (p.data.status === 0) {
-            if (p.data.list && p.data.list.length > 0) {
+            if (p.data.list) {
               p.data = p.data.list
             }
           } else if (p.data.status === 88) {

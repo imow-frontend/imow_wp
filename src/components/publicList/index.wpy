@@ -1,0 +1,132 @@
+<style lang="scss">
+  @import "../../zanui/btn.scss";
+  .list {
+    margin-top: 30rpx;
+  }
+  .noMsg {
+    text-align: center;
+    margin-top: 100rpx;
+    font-size: 30rpx;
+  }
+  .fbBtn {
+    margin-top: 30rpx;
+    text-align: center;
+  }
+  .zan-btn {
+    display: inline-block;
+    width: 230rpx;
+  }
+  .item {
+    border-bottom: 20rpx solid #ececec;
+    padding: 30rpx 50rpx;
+    .main {
+      display: flex;
+      padding-bottom: 20rpx;
+      border-bottom: 1rpx solid #cccccc;
+      .img {
+        width: 203rpx;
+        height: 160rpx;
+      }
+      .detail {
+        margin-left: 30rpx;
+        .title {
+          font-size: 28rpx;
+          font-weight: bold;
+        }
+        .subDetail {
+          font-size: 24rpx;
+          margin-top: 10rpx;
+        }
+      }
+    }
+    .operation {
+      padding-top: 10rpx;
+      // align-items: center;
+      .datetime {
+        float: left;
+        font-size: 20rpx;
+        color: #6c93b2;
+        margin-top: 6rpx;
+      }
+      .delBtn {
+        float: right;
+        .zan-btn{
+          border-radius: 30rpx;
+          width:180rpx;
+        }
+      }
+    }
+  }
+</style>
+<template>
+  <block>
+    <block wx:if="{{page.list.length>0}}">
+      <view class="list">
+        <repeat for="{{page.list}}" key="index" index="index" item="item">
+          <view class="item">
+            <view class="main">
+              <view>
+                <image src="{{item.images[0]}}" lazy-load="true" class="img" />
+              </view>
+              <view class="detail">
+                <view class="title">
+                  <titleElip>{{item.title}}</titleElip>
+                </view>
+                <view class="subDetail">
+                  <detailElip line="3">
+                    {{item.detail}}
+                  </detailElip>
+                </view>
+              </view>
+            </view>
+            <view class="operation zan-clearfix">
+              <view class="datetime">
+                发布时间 {{item.createTime}}
+              </view>
+              <view class="delBtn">
+                <button class="zan-btn zan-btn--primary zan-btn--mini" @tap="delItem">删除信息</button>
+              </view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+      <loadMore :page.sync="page" />
+    </block>
+    <block wx:else>
+      <view class="noMsg">
+        没有数据！
+      </view>
+      <view class="fbBtn">
+        <button class="zan-btn zan-btn--primary">立即发布</button>
+      </view>
+    </block>
+  </block>
+</template>
+<script>
+  import wepy from 'wepy'
+  import loadMore from '../weui/loadmore'
+  import Elip from '../share/elip'
+  import Tips from '../../utils/Tips'
+export default class PL extends wepy.component {
+    components = {
+      loadMore: loadMore,
+      titleElip: Elip,
+      detailElip: Elip
+    };
+    props = {
+      page: {
+        list: []
+      }
+    };
+    methods={
+      async delItem() {
+        try {
+          await Tips.confirm('确认删除吗?')
+        } catch (error) {
+          return false
+        }
+  
+      }
+    }
+  }
+</script>
