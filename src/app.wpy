@@ -63,7 +63,11 @@ export default class extends wepy.app {
     auth: {
       third_session: null
     },
-    pageParams: {}
+    pageParams: {},
+    device: {
+      brand: '', // 手机品牌
+      model: ''  // 手机型号
+    }
   }
 
   constructor () {
@@ -132,6 +136,14 @@ export default class extends wepy.app {
 
   async onLaunch(param) {
     this.syncStoreConfig('third_session')
+    // debugger
+    try {
+      var res = wx.getSystemInfoSync()
+      wepy.$instance.globalData.device['model'] = res.model
+      wepy.$instance.globalData.device['brand'] = res.brand
+    } catch (e) {
+  // Do something when catch error
+    }
   }
 
   syncStoreConfig(key) {

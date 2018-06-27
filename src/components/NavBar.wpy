@@ -1,8 +1,8 @@
 <template>
-  <view class="nav">
+  <view class="nav" style="background-image:url('{{isPhoneX?'http://pavr51yat.bkt.clouddn.com/wx_NavTop.jpg?imageView2/1/w/510/h/165/q/100':'http://pavr51yat.bkt.clouddn.com/wx_NavTop.jpg-text'}}')">
     <view class="top">
     </view>
-    <view class="main">
+    <view class="main" style="height:{{isPhoneX?'208rpx':'108rpx'}}">
       <view @tap="navigateBack" wx:if="{{showNavigateBack}}">
         <Icon class="normal" type="houtui" />
       </view>
@@ -36,6 +36,12 @@
 
         var url = currentPage.route
         return url !== 'pages/index' && url !== 'pages/post' && url !== 'pages/member'
+      },
+      isPhoneX() {
+        const model = wepy.$instance.globalData.device['model']
+        // const brand = wepy.$instance.globalData.device['brand']//
+        return model.indexOf('iPhone X') > -1
+
       }
     }
   }
@@ -46,12 +52,7 @@
     height: 20rpx;
     width: 100%;
   }
-  .nav {
-    /* background-color: red; */
-    background-image: url('http://pavr51yat.bkt.clouddn.com/wx_NavTop.jpg-text')
-  }
   .main {
-    height: 108rpx;
     position: relative;
     width: 100%;
     display: flex;

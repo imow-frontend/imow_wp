@@ -75,7 +75,7 @@
           }
           this.posting = false
           this.$apply()
-      }
+        }
       }
     };
     mixins = [base, input, router];
@@ -90,7 +90,7 @@
     height: 300rpx;
     background-color: red;
     display:flex;flex-direction:row;justify-content:center;align-items:center;
-      background-image: url('http://pavr51yat.bkt.clouddn.com/ex_searchWapper-text');
+      background-image: url('http://pavr51yat.bkt.clouddn.com/ex_searchWapper?imageView2/1/w/450/h/165/q/100');
   }
   .avatar{
     width: 175rpx;
