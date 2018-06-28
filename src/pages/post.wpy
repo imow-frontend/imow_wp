@@ -17,25 +17,31 @@
               </button>
           <view class="text">二手车</view>
         </view>
-        <view class="pd item">
+         <view class="pd item">
+          <button class="y-btn el-button" bindtap="routePost" data-type="6">
+                 <Icon6 type="chache xxxxlarge"/>
+              </button>
+               <view class="text">新车</view>
+        </view>
+        <view class="item">
           <button class="y-btn el-button" bindtap="routePost" data-type="2">
                  <Icon2 type="peijian xxxxlarge"/>
               </button>
                <view class="text">二手配件</view>
         </view>
-        <view  class="item">
+        <view  class="pd item">
           <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="3">
                  <Icon3 type="weixiu xxxxlarge"/>
               </button>
                 <view class="text">找维修</view>
         </view>
-        <view class="pd item">
+        <view class="item">
           <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="4">
                  <Icon4 type="qiugou xxxxlarge"/>
               </button>
                 <view class="text">求购</view>
         </view>
-        <view  class="item">
+        <view  class="pd item">
           <button class="y-btn el-button" bindtap="routeToNormalPost" data-type="5">
                  <Icon5 type="qita xxxxlarge"/>
               </button>
@@ -60,6 +66,7 @@
       Icon3: Icon,
       Icon4: Icon,
       Icon5: Icon,
+      Icon6: Icon,
     };
     methods={
       routePost(e) {
@@ -92,7 +99,8 @@
     height: 100%;
     content: '';
     display: block;
-    background-color: #9aa099;
+    // background-color: #9aa099;
+    background-image: url('http://pavr51yat.bkt.clouddn.com/post')
   }
   .btnWapper {
     display: flex;

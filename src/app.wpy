@@ -19,6 +19,7 @@ setStore(store)
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/authorization',
       'pages/index',
       'pages/publicList',
       'pages/editDetail',
@@ -32,7 +33,8 @@ export default class extends wepy.app {
       'backgroundTextStyle': 'light',
       'navigationBarBackgroundColor': '#fff',
       'navigationBarTextStyle': 'black',
-      'navigationStyle': 'custom'
+      'navigationStyle': 'custom',
+      'enablePullDownRefresh': true
     },
     tabBar: {
       color: '#AEADAD',
@@ -136,7 +138,7 @@ export default class extends wepy.app {
 
   async onLaunch(param) {
     this.syncStoreConfig('third_session')
-    // debugger
+    //
     try {
       var res = wx.getSystemInfoSync()
       wepy.$instance.globalData.device['model'] = res.model

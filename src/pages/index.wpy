@@ -52,6 +52,10 @@
           id: '1'
         },
         {
+          title: '新车',
+          id: '6'
+        },
+        {
           title: '二手配件',
           id: '2'
         },
@@ -73,17 +77,21 @@
     events = {
       async zanTabChange(selectedId, event) {
         if (this.type !== selectedId) {
+          Tips.loading('努力加载中')
           this.type = selectedId
           this.tabData.selectedId = selectedId
           this.page.reset()
           await this.next()
           this.$apply()
+          Tips.loaded()
         }
       },
       async search(params) {
+        Tips.loading('努力加载中')
         this.keyWord = params.key_word
         this.page.reset()
         await this.next()
+        Tips.loaded()
       }
     }
     async onLoad() {

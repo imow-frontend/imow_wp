@@ -28,7 +28,7 @@ const updateUser = user => {
 }
 
 const updateUserInfo = userInfo => {
-  debugger
+
   const store = getStore()
   const state = store.getState()
   const orignUser = state.userReducer['user']

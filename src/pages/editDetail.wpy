@@ -75,7 +75,7 @@ export default class PostNews extends wepy.page {
         Tips.loading('上传中..')
         this.posting = true
         const data = await postRequire.addOrUpdateUserInfo(contactName, contactMobile)
-        debugger
+
         if (data.status === 0) {
           Tips.success('修改成功', 2000)
           store.updateUser({

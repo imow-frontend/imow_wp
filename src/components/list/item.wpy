@@ -94,7 +94,7 @@
       //     this.item.isFollow = !this.item.isFollow
       //     this.$apply()
       //   }
-        debugger
+  
         this.props.item.isFollow = !this.props.item.isFollow
   
         this.$apply()

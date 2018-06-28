@@ -22,7 +22,7 @@ export default handleActions({
   [UpdateUserInfoAction] (state, action) {
     const {key, value} = action.payload
     console.info(`[dispatch] save : ${key} value : ${value}`)
-    debugger
+
     // return {
     //   ...state,
     //   [key]: value

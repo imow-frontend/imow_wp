@@ -68,11 +68,11 @@ export default class auth extends base {
       return rawUser
     } catch (error) {
       // 权限被拒绝默认名称和头像
-      if (error && error.errMsg && error.errMsg === 'getUserInfo:fail auth deny') {
+      if (error && error.errMsg) {
         return {
           userInfo: {
-            nickName: '阿母用户',
-            avatarUrl: '头像'
+            nickName: '尊敬的用户',
+            avatarUrl: 'https://dummyimage.com/110x165'
           }
         }
       }

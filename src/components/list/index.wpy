@@ -7,20 +7,27 @@
           <view class="item">
             <view class="up">
               <view class="avatar">
-                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url({{item.user.avatar}}); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(https://dummyimage.com/110x165); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
               </view>
               <view class="userInfo">
                 <view class="name">
-                  {{item.user.name}}
+                  {{item.contactName}}
                 </view>
                 <view class="mid">
-                  <DIcon type="dingwei" /><label class="pd">{{item.area}}</label>
-                  <BIcon type="bohao" /><label>{{item.user.mobile}}</label>
+                  <DIcon type="dingwei" />
+                  <label class="pd">{{item.area}}</label>
+                  <block wx:if="{{user.imowUser}}">
+                    <BIcon type="bohao" class="dia"/>
+                    <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
+                  </block>
+                   <block wx:else>
+                     <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                   </block>
                 </view>
                 <view class="bottom">
-                  <label class="pd">品牌:{{item.brand}}</label>
-                  <label class="pd">吨位:{{item.tonnage}}</label>
-                  <label class="pd">新旧程度:{{item.new}}</label>
+                  <label class="pd" wx:if="{{item.brand}}">品牌:{{item.brand}}</label>
+                  <label class="pd" wx:if="{{item.tonnage}}">吨位:{{item.tonnage}}</label>
+                  <label class="pd" wx:if="{{item.new}}">新旧程度:{{item.new}}</label>
                 </view>
               </view>
             </view>
@@ -73,209 +80,253 @@
   </block>
 </template>
 <script>
-  import wepy from 'wepy'
-  import loadMore from '../weui/loadmore'
-  // import Item from './item'
-  import router from '../../mixins/router'
-  import Icon from '../Icon'
-  import Avatar from '../share/avatar'
-  import postRequire from '../../api/postRequire'
-  export default class List extends wepy.component {
-    components = {
-      loadMore: loadMore,
-      Avatar,
-      DIcon: Icon,
-      BIcon: Icon,
-      TIcon: Icon,
-      CIcon: Icon,
-      GIcon: Icon,
-      FIcon: Icon
-    };
-    mixins = [router];
-    props = {
-      page: {
-        list: []
-      },
-      showBtn: true
-    };
-    getItem(id) {
-      let result = null
-      this.page.list.map(function(item) {
-        if (item.id === id) {
-          result = item
-          return false
+import wepy from 'wepy'
+import loadMore from '../weui/loadmore'
+import { connect } from 'wepy-redux'
+import store from '../../store/utils'
+import router from '../../mixins/router'
+import Icon from '../Icon'
+import Avatar from '../share/avatar'
+import postRequire from '../../api/postRequire'
+import Tips from '../../utils/Tips'
+
+@connect({
+  user: store.get('user')
+})
+export default class List extends wepy.component {
+  data={
+    yyxLoading: false
+  }
+  components = {
+    loadMore: loadMore,
+    Avatar,
+    DIcon: Icon,
+    BIcon: Icon,
+    TIcon: Icon,
+    CIcon: Icon,
+    GIcon: Icon,
+    FIcon: Icon
+  };
+  mixins = [router];
+  props = {
+    page: {
+      list: []
+    },
+    showBtn: true
+  };
+  getItem(id) {
+    let result = null
+    this.page.list.map(function(item) {
+      if (item.id === id) {
+        result = item
+        return false
+      }
+    })
+    return result
+  }
+  methods = {
+    yyx: async function(e) {
+      try {
+        await Tips.confirm('您现在没有绑定阿母账号,无法看到对方的手机号码,只能添加意向,我们会帮您联系对方。如果希望直接联系对方请使用阿母账号登录', {}, '我有意向')
+        if (!this.user.infoName || !this.user.infoMobile) {
+          this.routeEditDetail()
+          return
         }
-      })
-      return result
-    }
-    methods = {
-      previewImg: function(e) {
-        let that = this
-        const id = e.currentTarget.dataset.did
-        wx.previewImage({
-          current: e.currentTarget.id,
-          urls: that.getItem(id).images
-        })
-        postRequire.increateDemandCount(id)
-        // 增加浏览数
-      },
-      HandelFollow: async function(e) {
-        const id = e.currentTarget.dataset.did
-        const data = this.getItem(id).isFollow ? await postRequire.removeFollow(id)
-        : await postRequire.addFollow(id)
-        if (data.status === 0) {
-          this.page.list.map(function(item) {
-            if (item.id === id) {
-              item.isFollow = !item.isFollow
-              return false
-            }
-          })
+        if (!this.yyxLoading) {
+          this.yyxLoading = true
+          const id = e.currentTarget.dataset.did
+          const data = await postRequire.addInterested(id)
+          if (data.status === 0) {
+            Tips.success('已成功', 1000)
+          }
+          this.yyxLoading = false
           this.$apply()
         }
+      } catch (error) {
+        return false
+      }
+
+    },
+    dia(e) {
+      const tel = e.currentTarget.dataset.tel
+      wx.makePhoneCall({
+        phoneNumber: `${tel}`
+      })
+    },
+    previewImg: function(e) {
+      let that = this
+      const id = e.currentTarget.dataset.did
+      wx.previewImage({
+        current: e.currentTarget.id,
+        urls: that.getItem(id).images
+      })
+      // 增加浏览数
+      postRequire.increateDemandCount(id)
+    },
+    HandelFollow: async function(e) {
+      const id = e.currentTarget.dataset.did
+      const data = this.getItem(id).isFollow
+        ? await postRequire.removeFollow(id)
+        : await postRequire.addFollow(id)
+      if (data.status === 0) {
+        this.page.list.map(function(item) {
+          if (item.id === id) {
+            item.isFollow = !item.isFollow
+            return false
+          }
+        })
+        this.$apply()
       }
     }
-  }
+  };
+}
 </script>
 
 <style lang="scss">
-  @import "../../zanui/btn.scss";
-  .list {
-    margin-top: 30rpx;
-    background-color: #ededed;
-    .icon {
+@import "../../zanui/btn.scss";
+.mid .yyx{
+  width: 130rpx;
+}
+.dia{
+  color: #dd0a18
+}
+.list {
+  margin-top: 30rpx;
+  background-color: #ededed;
+  .icon {
+    font-size: 20rpx;
+    line-height: 20rpx;
+    padding: 0rpx;
+    min-width: 0rpx;
+    width: auto;
+    color: #747474;
+    &.active {
+      color: #dd0a18;
+    }
+  }
+}
+.noMsg {
+  text-align: center;
+  margin-top: 100rpx;
+  font-size: 30rpx;
+}
+.fbBtn {
+  margin-top: 30rpx;
+  text-align: center;
+}
+.zan-btn {
+  display: inline-block;
+  width: 230rpx;
+}
+.item {
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+  padding-bottom: 10rpx;
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+.btnWapper {
+  display: flex;
+  border-top: 1px solid #e5e5e5;
+  .btnItem {
+    flex: 1;
+    color: #747474;
+    text-align: center;
+    text {
       font-size: 20rpx;
-      line-height: 20rpx;
-      padding: 0rpx;
-      min-width: 0rpx;
-      width: auto;
-      color: #747474;
-      &.active {
-        color: #dd0a18;
-      }
     }
   }
-  .noMsg {
-    text-align: center;
-    margin-top: 100rpx;
-    font-size: 30rpx;
+}
+.up {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 30rpx;
+  display: flex;
+  padding-top: 30rpx;
+}
+.imgWapper {
+  margin-top: 22rpx;
+  display: flex;
+  flex-wrap: wrap;
+  image {
+    width: 210rpx;
+    height: 210rpx;
+    margin-left: 18rpx;
+    margin-bottom: 15rpx;
   }
-  .fbBtn {
-    margin-top: 30rpx;
-    text-align: center;
-  }
-  .zan-btn {
-    display: inline-block;
-    width: 230rpx;
-  }
-  .item {
-    padding-left: 30rpx;
-    padding-right: 30rpx;
-    padding-bottom: 10rpx;
-    background-color: #ffffff;
-    margin-bottom: 20rpx;
-  }
-  .btnWapper {
-    display: flex;
-    border-top: 1px solid #e5e5e5;
-    .btnItem {
-      flex: 1;
-      color: #747474;
-      text-align: center;
-      text {
-        font-size: 20rpx;
-      }
-    }
-  }
-  .up {
-    border-bottom: 1px solid #e5e5e5;
-    padding-bottom: 30rpx;
-    display: flex;
-    padding-top: 30rpx;
-  }
-  .imgWapper {
-    margin-top: 22rpx;
-    display: flex;
-    flex-wrap: wrap;
-    image {
-      width: 210rpx;
-      height: 210rpx;
-      margin-left: 18rpx;
-      margin-bottom: 15rpx;
-    }
-  }
-  .productInfo {
-    flex: 1
-  }
-  .proName {
-    font-size: 28rpx;
-    font-weight: bold;
-  }
-  .detail {
-    text {
-      font-size: 23rpx;
-      margin-top: 10rpx;
-    }
-  }
-  .more {
-    text {
-      font-size: 18rpx;
-      color: #747474;
-    }
-    text-align: right;
+}
+.productInfo {
+  flex: 1;
+}
+.proName {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.detail {
+  text {
+    font-size: 23rpx;
     margin-top: 10rpx;
   }
-  .dowm {
-    display: flex; // width: 100%;
-    margin: 30rpx 20rpx;
+}
+.more {
+  text {
+    font-size: 18rpx;
+    color: #747474;
   }
-  .userInfo {
-    flex: 1;
-    margin-left: 20rpx;
-    padding: 25rpx;
+  text-align: right;
+  margin-top: 10rpx;
+}
+.dowm {
+  display: flex; // width: 100%;
+  margin: 30rpx 20rpx;
+}
+.userInfo {
+  flex: 1;
+  margin-left: 20rpx;
+  padding: 25rpx;
+  color: #949494;
+  background-color: #f3f3f3;
+  border-radius: 10rpx;
+  view {
+    font-size: 20rpx;
     color: #949494;
-    background-color: #f3f3f3;
-    border-radius: 10rpx;
-    view {
-      font-size: 20rpx;
-      color: #949494;
-    }
-    .pd {
-      padding-right: 27rpx;
-    }
-    label {
-      vertical-align: baseline;
-    }
-    .name {
-      font-size: 30rpx;
-      color: #444444;
-    }
   }
-  .avatar {
-    display: inline-block;
-    position: relative;
-    width: 127rpx;
-    height: 127rpx;
+  .pd {
+    padding-right: 27rpx;
   }
-  .avatar__pic {
-    display: block;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+  label {
+    vertical-align: baseline;
   }
-  .avatar__mold--circle {
-    border-radius: 50%;
+  .name {
+    font-size: 30rpx;
+    color: #444444;
   }
-  .avatar__badge {
-    position: absolute;
-    top: -8rpx;
-    right: -8rpx;
-    z-index: 1;
-  }
-  .fr {
-    float: right;
-    height: 40rpx;
-    line-height: 40rpx;
-  }
+}
+.avatar {
+  display: inline-block;
+  position: relative;
+  width: 127rpx;
+  height: 127rpx;
+}
+.avatar__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.avatar__mold--circle {
+  border-radius: 50%;
+}
+.avatar__badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  z-index: 1;
+}
+.fr {
+  float: right;
+  height: 40rpx;
+  line-height: 40rpx;
+}
 </style>

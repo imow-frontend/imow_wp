@@ -16,11 +16,11 @@ export default class Icon extends wepy.component {
 
 @font-face {
   font-family: 'iconfont';  /* project id 717791 */
-  src: url('//at.alicdn.com/t/font_717791_pw6xky1svyh.eot');
-  src: url('//at.alicdn.com/t/font_717791_pw6xky1svyh.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_717791_pw6xky1svyh.woff') format('woff'),
-  url('//at.alicdn.com/t/font_717791_pw6xky1svyh.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_717791_pw6xky1svyh.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.eot');
+  src: url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.woff') format('woff'),
+  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.svg#iconfont') format('svg');
 }
 @mixin icon-size($size){
   line-height: $size;
@@ -86,6 +86,7 @@ export default class Icon extends wepy.component {
 
 .icon-fenge:before { content: "\e681"; }
 
+.icon-chache:before { content: "\e61c"; }
 
 
 </style>

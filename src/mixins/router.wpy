@@ -36,6 +36,10 @@ export default class router extends wepy.mixin {
     wx.navigateTo({url: `/pages/publicList`})
   }
 
+  routeEditDetail() {
+    wx.navigateTo({url: `/pages/editDetail`})
+  }
+
    /**
    * 跳转到登录
    */
@@ -88,6 +92,9 @@ export default class router extends wepy.mixin {
     },
     redirectToLogin() {
       this.redirectToLogin()
+    },
+    routeEditDetail() {
+      this.routeEditDetail()
     }
 
   };
