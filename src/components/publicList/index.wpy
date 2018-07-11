@@ -66,7 +66,7 @@
           <view class="item">
             <view class="main">
               <view>
-                <image src="{{item.images[0]}}" lazy-load="true" class="img" />
+                <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+item.images[0]+'?x-oss-process=style/list_img'}}" lazy-load="true" class="img" />
               </view>
               <view class="detail">
                 <view class="title">
@@ -97,7 +97,7 @@
         没有数据！
       </view>
       <view class="fbBtn">
-        <button class="zan-btn zan-btn--primary">立即发布</button>
+        <button class="zan-btn zan-btn--primary" @tap="routeToPost">立即发布</button>
       </view>
     </block>
   </block>
@@ -107,6 +107,7 @@
   import loadMore from '../weui/loadmore'
   import Elip from '../share/elip'
   import Tips from '../../utils/Tips'
+  import router from '../../mixins/router'
   import postRequire from '../../api/postRequire'
 export default class PL extends wepy.component {
     components = {
@@ -119,6 +120,7 @@ export default class PL extends wepy.component {
         list: []
       }
     };
+    mixins = [router];
     methods={
       async delItem(e) {
         try {

@@ -78,6 +78,7 @@
     methods={
       previewImg: function(e) {
         let that = this
+  
         wx.previewImage({
           current: e.currentTarget.id,
           urls: that.item.images

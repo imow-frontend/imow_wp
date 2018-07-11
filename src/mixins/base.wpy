@@ -10,7 +10,7 @@ export default class base extends wepy.mixin {
   methods = {
     nopen() {
       Tips.alert('尚未开放')
-    }
+    },
   };
 
   static injectionParas() {
