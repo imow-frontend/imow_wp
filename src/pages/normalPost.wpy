@@ -85,8 +85,8 @@ import postRequire from '../api/postRequire'
 export default class PostNews extends wepy.page {
   data = {
     posting: false,
-    brandRange: ['中力', '其他'],
-    newRange: ['八成新', '八五成新', '九成新', '全新'],
+    brandRange: ['中力', '杭叉', '合力', '林德', '龙工', '科朗', '丰田', '比亚迪'],
+    newRange: ['全新', '9.5新', '9新', '8新', '5新', '其他'],
     brand: '',
     _new: '',
     area: '',

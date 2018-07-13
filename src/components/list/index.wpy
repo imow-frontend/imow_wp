@@ -7,7 +7,7 @@
           <view class="item">
             <view class="up">
               <view class="avatar">
-                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(https://dummyimage.com/110x165); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
               </view>
               <view class="userInfo">
                 <view class="name">
