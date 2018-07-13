@@ -298,7 +298,7 @@ export default class PostNews extends wepy.page {
       return this.postType === '1' || this.postType === '6'
     },
     showImage() {
-      return this.postType !== '3' || this.postType !== '4'
+      return this.postType !== '4'
     }
   }
 }

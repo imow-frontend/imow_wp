@@ -65,7 +65,7 @@
         <repeat for="{{page.list}}" key="index" index="index" item="item">
           <view class="item">
             <view class="main">
-              <view>
+              <view wx:if="{{item.images[0]}}">
                 <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+item.images[0]+'?x-oss-process=style/list_img'}}" lazy-load="true" class="img" />
               </view>
               <view class="detail">
