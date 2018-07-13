@@ -2,7 +2,7 @@
   <block>
     <NavBar title="发布" />
     <form bindsubmit="formSubmit" bindreset="formReset">
-      <view class="zan-panel gp">
+      <view class="zan-panel">
         <titleField :options="form_title" componentId="form_title" />
         <tonnageField :options="form_tonnage" componentId="form_tonnage"  wx:if="{{showTonnage}}"/>
         <!-- ------------------------ 联系人 ---------------------------- -->
@@ -44,7 +44,7 @@
         </view>
         <detailField :options="form_detail" componentId="form_detail" />
       </view>
-      <view class="imageWapper">
+      <view class="imageWapper gp" wx:if="{{showImage}}">
         <repeat for="{{files}}" key="index" index="index" item="file">
           <view class="re">
             <view class="weui-uploader__file" bindtap="previewImage" id="{{file}}">
@@ -161,7 +161,7 @@ export default class PostNews extends wepy.page {
       let _new = (this.showNew && this._new) || 'undefined'
       const area = this.area
       const detail = this.input['form_detail']
-      const files = this.files
+      const files = (this.showImage && this.files) || 'undefined'
       const type = this.postType
       const rules = [
         {
@@ -217,8 +217,8 @@ export default class PostNews extends wepy.page {
         {
           value: files,
           method: 'rangelength',
-          message: '上传1到10个图片',
-          param: [0, 10]
+          message: '上传3到9张图片',
+          param: [3, 9]
         }
       ]
       if (!this.check(rules)) {
@@ -232,8 +232,11 @@ export default class PostNews extends wepy.page {
 
         Tips.loading('上传中..')
         this.posting = true
-        const fileResult = await postRequire.uploadImg(files)
-        let images = fileResult.join(',')
+        let images = null
+        if (this.showImage) {
+          const fileResult = await postRequire.uploadImg(files)
+          images = fileResult.join(',')
+        }
         const data = await postRequire.add({
           title,
           tonnage,
@@ -281,6 +284,7 @@ export default class PostNews extends wepy.page {
     this.$apply()
   }
   onShow() {
+
     base.injectionParas.call(this)
   }
   computed={
@@ -292,6 +296,9 @@ export default class PostNews extends wepy.page {
     },
     showBrand() {
       return this.postType === '1' || this.postType === '6'
+    },
+    showImage() {
+      return this.postType !== '3' || this.postType !== '4'
     }
   }
 }
@@ -301,7 +308,7 @@ export default class PostNews extends wepy.page {
 @import "../zanui/panel.scss";
 @import "../zanui/btn.scss";
 .gp {
-  border-bottom: 20rpx solid #e8e8e8;
+  border-top: 20rpx solid #e8e8e8;
 }
 .imageWapper {
   display: flex;

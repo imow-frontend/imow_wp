@@ -3,7 +3,7 @@
     <view class="top">
     </view>
     <view class="main" style="height:{{isPhoneX?'208rpx':'108rpx'}}">
-      <view @tap="navigateBack" wx:if="{{showNavigateBack}}">
+      <view @tap="back" wx:if="{{showNavigateBack}}">
         <Icon class="normal" type="houtui" />
       </view>
       <p class="title">
@@ -26,8 +26,18 @@
       title: {
         type: String,
         default: '阿母工业'
+      },
+      navHome: {
+        type: String,
+        default: '0'
       }
     };
+    methods={
+      back() {
+  
+        (this.navHome === '1') ? this.routeToIndex() : this.navigateBack()
+      }
+    }
     computed={
       showNavigateBack() {
         var pages = getCurrentPages()

@@ -1,6 +1,6 @@
 <template>
   <view>
-    <NavBar title="发布列表" />
+    <NavBar title="发布列表" navHome="1"/>
     <SearchBar :showHotSearch="showHotSearch" />
     <List :page.sync="page" :showBtn="showBtn" wx:if="{{init}}" />
   </view>
