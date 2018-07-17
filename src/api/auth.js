@@ -71,8 +71,8 @@ export default class auth extends base {
       if (error && error.errMsg) {
         return {
           userInfo: {
-            nickName: '尊敬的用户',
-            avatarUrl: 'https://dummyimage.com/110x165'
+            nickName: '阿母工业会员',
+            avatarUrl: 'http://pavr51yat.bkt.clouddn.com/avatarUrl'
           }
         }
       }
