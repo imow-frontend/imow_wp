@@ -19,6 +19,25 @@
   import store from '../store/utils'
   import Tips from '../utils/Tips'
   export default class Index extends wepy.page {
+    onShareAppMessage=function (res) {
+      let title = ''
+      let path = ''
+      let image = ''
+      if (res.from === 'button') {
+      // 来自页面内转发按钮
+        console.log(res.target)
+        title = res.target.dataset.title
+        image = 'https://imow-app.oss-cn-hangzhou.aliyuncs.com/' + res.target.dataset.image
+        let id = res.target.dataset.did
+        path = '/path/detail?id=' + id
+      }
+  
+      return {
+        title: title,
+        path: path,
+        imageUrl: image
+      }
+    }
     components = {
       SearchBar,
       NavBar,
@@ -102,6 +121,7 @@
       Tips.loaded()
     }
     mixins = [pagination, base];
+  
   }
 </script>
 
