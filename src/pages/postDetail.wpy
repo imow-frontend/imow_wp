@@ -1,0 +1,49 @@
+<template>
+  <view>
+    <NavBar title="需求详情" />
+    <List :page.sync="page" :showBtn="showBtn" wx:if="{{init}}" />
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import NavBar from '../components/NavBar'
+  import List from '../components/list/index'
+  import pagination from '../mixins/pagination'
+  import base from '../mixins/base'
+  import postRequire from '../api/postRequire'
+  import store from '../store/utils'
+  import Tips from '../utils/Tips'
+
+  export default class PostDetail extends wepy.page {
+    components = {
+      NavBar,
+      List
+    };
+    data = {
+      showBtn: false,
+      init: false,
+      id: '',
+      params: () => {
+        return {
+          id: this.id
+        }
+      },
+      page: {
+        list: []
+      }
+    };
+    async onLoad(params) {
+      this.id = params.id
+      Tips.loading('努力加载中')
+      await store.init()
+      this.page = postRequire.Detail()
+      await this.next()
+    }
+    mixins = [pagination, base];
+  }
+</script>
+
+<style lang="scss">
+
+</style>

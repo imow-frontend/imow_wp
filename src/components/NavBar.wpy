@@ -3,7 +3,7 @@
     <view class="top">
     </view>
     <view class="main" style="height:{{isPhoneX?'208rpx':'108rpx'}}">
-      <view @tap="navigateBack" wx:if="{{showNavigateBack}}">
+      <view @tap="back" wx:if="{{showNavigateBack}}">
         <Icon class="normal" type="houtui" />
       </view>
       <p class="title">
@@ -22,6 +22,18 @@
     components = {
       Icon
     };
+    methods= {
+      back() {
+        var pages = getCurrentPages()
+        var previousPage = pages[pages.length - 2]
+        if (!previousPage) {
+          this.routeToIndex()
+        } else {
+          this.navigateBack()
+        }
+  
+      }
+    }
     props = {
       title: {
         type: String,

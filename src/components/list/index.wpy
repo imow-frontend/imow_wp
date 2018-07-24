@@ -17,12 +17,12 @@
                   <DIcon type="dingwei" />
                   <label class="pd">{{item.area}}</label>
                   <block wx:if="{{user.imowUser}}">
-                    <BIcon type="bohao" class="dia"/>
+                    <BIcon type="bohao" class="dia" />
                     <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
                   </block>
-                   <block wx:else>
-                     <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
-                   </block>
+                  <block wx:else>
+                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                  </block>
                 </view>
                 <view class="bottom">
                   <label class="pd" wx:if="{{item.brand}}">品牌:{{item.brand}}</label>
@@ -62,6 +62,10 @@
               <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
                 <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
                 <text> {{item.isFollow?'取消关注':'关注'}}</text>
+                <FIcon type="fenge fr" />
+              </view>
+              <view class="btnItem">
+                <button open-type="share" data-did="{{item.id}}" data-title="{{item.title}}" data-image="{{item.images[0]}}">分享</button>
               </view>
             </view>
           </view>
@@ -94,9 +98,9 @@ import Tips from '../../utils/Tips'
   user: store.get('user')
 })
 export default class List extends wepy.component {
-  data={
+  data = {
     yyxLoading: false
-  }
+  };
   components = {
     loadMore: loadMore,
     Avatar,
@@ -127,7 +131,11 @@ export default class List extends wepy.component {
   methods = {
     yyx: async function(e) {
       try {
-        await Tips.confirm('您现在没有绑定阿母账号,无法看到对方的手机号码,只能添加意向,我们会帮您联系对方。如果希望直接联系对方请使用阿母账号登录', {}, '我有意向')
+        await Tips.confirm(
+          '您现在没有绑定阿母账号,无法看到对方的手机号码,只能添加意向,我们会帮您联系对方。如果希望直接联系对方请使用阿母账号登录',
+          {},
+          '我有意向'
+        )
         if (!this.user.infoName || !this.user.infoMobile) {
           this.routeEditDetail()
           return
@@ -145,7 +153,6 @@ export default class List extends wepy.component {
       } catch (error) {
         return false
       }
-
     },
     dia(e) {
       const tel = e.currentTarget.dataset.tel
@@ -157,7 +164,7 @@ export default class List extends wepy.component {
       let that = this
       const id = e.currentTarget.dataset.did
       let img = []
-      that.getItem(id).images.map((obj) => {
+      that.getItem(id).images.map(obj => {
         img.push('https://imow-app.oss-cn-hangzhou.aliyuncs.com/' + obj)
       })
       wx.previewImage({
@@ -181,6 +188,9 @@ export default class List extends wepy.component {
         })
         this.$apply()
       }
+      wx.showShareMenu({
+        withShareTicket: true
+      })
     }
   };
 }
@@ -188,11 +198,11 @@ export default class List extends wepy.component {
 
 <style lang="scss">
 @import "../../zanui/btn.scss";
-.mid .yyx{
+.mid .yyx {
   width: 130rpx;
 }
-.dia{
-  color: #dd0a18
+.dia {
+  color: #dd0a18;
 }
 .list {
   margin-top: 30rpx;
@@ -238,6 +248,22 @@ export default class List extends wepy.component {
     text-align: center;
     text {
       font-size: 20rpx;
+    }
+    button::after{ border: none; }
+    button {
+      display:inline;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 20rpx;
+      text-align: center;
+      text-decoration: none;
+      line-height: 2.55555556;
+      border-radius: 0px;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+      color: #747474;
+      background-color: #ffffff;
     }
   }
 }

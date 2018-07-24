@@ -18,6 +18,8 @@
   import postRequire from '../api/postRequire'
   import store from '../store/utils'
   import Tips from '../utils/Tips'
+  import onShareAppMessage from '../utils/Share'
+
   export default class Index extends wepy.page {
     components = {
       SearchBar,
@@ -102,6 +104,8 @@
       Tips.loaded()
     }
     mixins = [pagination, base];
+    onShareAppMessage = onShareAppMessage
+  
   }
 </script>
 

@@ -26,6 +26,12 @@ export default class postRequire extends base {
     })
   }
 
+  static Detail() {
+    const url = `${this.baseUrl}/Demand/Detail`
+    return new Page(url, (data) => {
+    })
+  }
+
   static async list(params = {}) {
     const url = `${this.baseUrl}/Demand/getList`
     const result = await this.post(url, params)

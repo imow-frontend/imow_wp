@@ -16,6 +16,7 @@
   import postRequire from '../api/postRequire'
   import store from '../store/utils'
   import Tips from '../utils/Tips'
+  import onShareAppMessage from '../utils/Share'
 
   export default class FollowList extends wepy.page {
     components = {
@@ -56,6 +57,7 @@
       await this.next(this.params)
     }
     mixins = [pagination, base];
+    onShareAppMessage = onShareAppMessage
   }
 </script>
 
