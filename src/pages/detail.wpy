@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="page">
     <NavBar></NavBar>
     <view class="ctn">
       <!-- 倒计时条 -->
@@ -19,7 +19,7 @@
             <view class="mid">
               <DIcon type="dingwei" />
               <label class="pd">浙江杭州</label>
-              <button>出个价</button>
+              <button @tap="handleGivePrice">出个价</button>
             </view>
           </view>
         </view>
@@ -58,12 +58,31 @@
         </view>
       </view>
       <view class="record">
-          <view>最近出价记录</view>
-          <repeat for={{6}} key="index" index="index">
-          <view><image src="http://dummyimage.com/20x20"/><text>{{username}}</text> <text class="price"><block wx:if="{{index===0}}">历史最高价</block>￥31</text></view>
-          </repeat>
+        <view>最近出价记录</view>
+        <repeat for={{6}} key="index" index="index">
+          <view>
+            <image src="http://dummyimage.com/20x20" />
+            <text>{{username}}</text>
+            <text class="price">
+              <block wx:if="{{index===0}}">历史最高价</block>￥31</text>
+          </view>
+        </repeat>
       </view>
-      <view class="givePrice">出个价</view>
+      <view class="givePrice" @tap="handleGivePrice">出个价</view>
+      <view catchtouchmove='true' class="popupPane" @tap="handleGivePrice" wx:if="{{isShow}}">
+        <view class="mask"></view>
+        <view class="popupPaneCtn">
+          <text>当前价￥{{initPrice}}</text>
+          <view class="numberInput">
+            <view catchtap="minsStep" class="{{opacityMins? 'mins': ''}}">-10</view>
+            <view class="price">￥{{currentPrice}}</view>
+            <view catchtap="addStep" class="add">+{{step}}</view>
+          </view>
+          <view class="btn">
+            <view @tap="addPrice">确认出价</view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -88,6 +107,7 @@ export default class Detail extends wepy.page {
   };
 
   data = {
+    isShow: true,
     status: false,
     imageList: [
       'http://dummyimage.com/300x100',
@@ -100,7 +120,11 @@ export default class Detail extends wepy.page {
       isFollow: true,
       id: '1101'
     },
-    username: '王金序'
+    username: '王金序',
+    step: 10,
+    currentPrice: 21,
+    initPrice: 11,
+    opacityMins: true
   };
 
   methods = {
@@ -118,22 +142,138 @@ export default class Detail extends wepy.page {
         })
         this.$apply()
       }
+    },
+    handleGivePrice() {
+      // 控制出价的弹层的显示与隐藏
+      this.isShow = !this.isShow
+    },
+    addStep() {
+      // 根据加价幅度来加价
+      this.currentPrice = this.currentPrice + this.step
+      this.opacityMins = false
+    },
+
+    minsStep() {
+      // 根据减价幅度来减价
+      let temp = this.currentPrice - this.step
+      if (temp <= this.step + this.initPrice) {
+        this.currentPrice = this.step + this.initPrice
+        this.opacityMins = true
+      } else {
+        this.currentPrice = this.currentPrice - this.step
+        this.opacityMins = false
+      }
+    },
+
+    async addPrice() {
+      let res = await postRequire.addPrice(this.currentPrice)
+      console.log(res)
+      if (res.status) {
+        wx.showToast({
+          title: '出价成功！',
+          icon: 'success',
+          duration: 2000
+        })
+      }
     }
   };
 }
 </script>
 
 <style lang="scss" scoped>
+.page {
+  overflow: hidden;
+}
+
+@keyframes sliderUp {
+  from {
+    transform: translateY(100rpx)
+  } to {
+    transform: translateY(0rpx)
+  }
+}
+
+.popupPane {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+
+  .mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: black;
+  opacity: 0.4;
+  }
+
+  .popupPaneCtn {
+    position: absolute;
+    z-index: 11;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20rpx;
+    animation: sliderUp .3s forwards;
+    text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 20rpx;
+
+      view {
+      background-color: #dd0b1a;
+      color: white;
+      font-size: 35rpx;
+      padding: 15rpx 0;
+      text-align: center;
+      }
+    }
+
+    .numberInput {
+      display: flex;
+      flex-direction: row;
+      padding: 30rpx;
+      justify-content: space-around;
+      view {
+        width: 120rpx;
+        height: 120rpx;
+        line-height: 118rpx;
+        font-size: 30rpx;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        background-color: #dd0b1a;
+      }
+
+      .mins {
+        background-color: #949494;
+      }
+
+      .price {
+        font-size: 40rpx;
+        background-color: white;
+        color: black;
+      }
+    }
+  }
+}
+
 .ctn {
   padding-bottom: 40px;
-  background-color:#ededed;
+  background-color: #ededed;
   .clock {
     text-align: center;
     background-color: #dd0b1a;
     color: #fff;
-    height: 25px;
-    font-size: 15px;
-    line-height: 25px;
+    height: 20px;
+    font-size: 25rpx;
+    line-height: 20px;
   }
 
   .article {
@@ -147,7 +287,6 @@ export default class Detail extends wepy.page {
       flex-direction: row;
       border-bottom: 1px solid #e5e5e5;
       padding-bottom: 30rpx;
-
     }
 
     .productInfo {
