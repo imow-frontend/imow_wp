@@ -1,0 +1,467 @@
+<template>
+  <view class="page">
+    <NavBar></NavBar>
+    <view class="ctn">
+      <!-- 倒计时条 -->
+      <view class="clock">
+        <block wx:if="{{status}}">距离拍卖开始</block>
+        <block wx:else>距离拍卖结束 3小时19分钟15秒</block>
+      </view>
+      <view class="article">
+        <view class="title">
+          <view class="avatar">
+            <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+          </view>
+          <view class="userInfo">
+            <view class="name">
+              王金序
+            </view>
+            <view class="mid">
+              <DIcon type="dingwei" />
+              <label class="pd">浙江杭州</label>
+              <button @tap="handleGivePrice">出个价</button>
+            </view>
+          </view>
+        </view>
+        <view class="productInfo">
+          <text class="name">内燃叉车</text>
+          <text class="detail">
+            叉车是工业搬运车辆，是指对成件托盘货物进行装卸、堆垛和短距离运输作业的各种轮式搬运车辆。国际标准化组织ISO/TC110称为工业车辆。常用于仓储大型物件的运输，通常使用燃油机或者电池驱动。
+          </text>
+          <view class="imageCtn">
+            <repeat for="{{imageList}}" key="index" index="index" item="item">
+              <image src="{{item}}" />
+            </repeat>
+          </view>
+          <view class="btnWapper">
+            <view class="btnItem">
+              <view>
+                <TIcon type="shijian" />
+                <text> {{item.createTime}}</text>
+                <FIcon type="fenge fr" />
+              </view>
+            </view>
+            <view class="btnItem">
+              <CIcon type="chakan" />
+              <text> {{item.count}}次</text>
+              <FIcon type="fenge fr" />
+            </view>
+            <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
+              <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
+              <text> {{item.isFollow?'取消关注':'关注'}}</text>
+              <FIcon type="fenge fr" />
+            </view>
+            <view class="btnItem">
+              <button open-type="share" data-did="{{item.id}}" data-title="{{item.title}}" data-image="{{item.images[0]}}">分享</button>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="record">
+        <view>最近出价记录</view>
+        <repeat for={{6}} key="index" index="index">
+          <view>
+            <image src="http://dummyimage.com/20x20" />
+            <text>{{username}}</text>
+            <text class="price">
+              <block wx:if="{{index===0}}">历史最高价</block>￥31</text>
+          </view>
+        </repeat>
+      </view>
+      <view class="givePrice" @tap="handleGivePrice">出个价</view>
+      <view catchtouchmove='true' class="popupPane" @tap="handleGivePrice" wx:if="{{isShow}}">
+        <view class="mask"></view>
+        <view class="popupPaneCtn">
+          <text>当前价￥{{initPrice}}</text>
+          <view class="numberInput">
+            <view catchtap="minsStep" class="{{opacityMins? 'mins': ''}}">-10</view>
+            <view class="price">￥{{currentPrice}}</view>
+            <view catchtap="addStep" class="add">+{{step}}</view>
+          </view>
+          <view class="btn">
+            <view @tap="addPrice">确认出价</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import NavBar from '../components/NavBar'
+import Icon from '../components/Icon'
+import Avatar from '../components/share/avatar'
+import postRequire from '../api/postRequire'
+
+export default class Detail extends wepy.page {
+  components = {
+    NavBar,
+    BIcon: Icon,
+    CIcon: Icon,
+    DIcon: Icon,
+    FIcon: Icon,
+    TIcon: Icon,
+    GIcon: Icon,
+    Avatar
+  };
+
+  data = {
+    isShow: true,
+    status: false,
+    imageList: [
+      'http://dummyimage.com/300x100',
+      'http://dummyimage.com/100x100',
+      'http://dummyimage.com/50x100'
+    ],
+    item: {
+      createTime: '2018-05-10',
+      count: 5,
+      isFollow: true,
+      id: '1101'
+    },
+    username: '王金序',
+    step: 10,
+    currentPrice: 21,
+    initPrice: 11,
+    opacityMins: true
+  };
+
+  methods = {
+    HandelFollow: async function(e) {
+      const id = e.currentTarget.dataset.did
+      const data = this.item.isFollow
+        ? await postRequire.removeFollow(id)
+        : await postRequire.addFollow(id)
+      if (data.status === 0) {
+        this.item.map(function(item) {
+          if (item.id === id) {
+            item.isFollow = !item.isFollow
+            return false
+          }
+        })
+        this.$apply()
+      }
+    },
+    handleGivePrice() {
+      // 控制出价的弹层的显示与隐藏
+      this.isShow = !this.isShow
+    },
+    addStep() {
+      // 根据加价幅度来加价
+      this.currentPrice = this.currentPrice + this.step
+      this.opacityMins = false
+    },
+
+    minsStep() {
+      // 根据减价幅度来减价
+      let temp = this.currentPrice - this.step
+      if (temp <= this.step + this.initPrice) {
+        this.currentPrice = this.step + this.initPrice
+        this.opacityMins = true
+      } else {
+        this.currentPrice = this.currentPrice - this.step
+        this.opacityMins = false
+      }
+    },
+
+    async addPrice() {
+      let res = await postRequire.addPrice(this.currentPrice)
+      console.log(res)
+      if (res.status) {
+        wx.showToast({
+          title: '出价成功！',
+          icon: 'success',
+          duration: 2000
+        })
+      }
+    }
+  };
+}
+</script>
+
+<style lang="scss" scoped>
+.page {
+  overflow: hidden;
+}
+
+@keyframes sliderUp {
+  from {
+    transform: translateY(100rpx)
+  } to {
+    transform: translateY(0rpx)
+  }
+}
+
+.popupPane {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+
+  .mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: black;
+  opacity: 0.4;
+  }
+
+  .popupPaneCtn {
+    position: absolute;
+    z-index: 11;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20rpx;
+    animation: sliderUp .3s forwards;
+    text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 20rpx;
+
+      view {
+      background-color: #dd0b1a;
+      color: white;
+      font-size: 35rpx;
+      padding: 15rpx 0;
+      text-align: center;
+      }
+    }
+
+    .numberInput {
+      display: flex;
+      flex-direction: row;
+      padding: 30rpx;
+      justify-content: space-around;
+      view {
+        width: 120rpx;
+        height: 120rpx;
+        line-height: 118rpx;
+        font-size: 30rpx;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        background-color: #dd0b1a;
+      }
+
+      .mins {
+        background-color: #949494;
+      }
+
+      .price {
+        font-size: 40rpx;
+        background-color: white;
+        color: black;
+      }
+    }
+  }
+}
+
+.ctn {
+  padding-bottom: 40px;
+  background-color: #ededed;
+  .clock {
+    text-align: center;
+    background-color: #dd0b1a;
+    color: #fff;
+    height: 20px;
+    font-size: 25rpx;
+    line-height: 20px;
+  }
+
+  .article {
+    padding: 30rpx;
+    padding-bottom: 0;
+    flex-direction: column;
+    background-color: #fff;
+
+    .title {
+      display: flex;
+      flex-direction: row;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 30rpx;
+    }
+
+    .productInfo {
+      padding-top: 15px;
+      .name {
+        font-weight: bold;
+        font-size: 28rpx;
+      }
+      .detail {
+        font-size: 23rpx;
+        margin-top: 10px;
+      }
+      .imageCtn {
+        margin-top: 10px;
+        image {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.btnWapper {
+  display: flex;
+  border-top: 1px solid #e5e5e5;
+  .btnItem {
+    flex: 1;
+    color: #747474;
+    text-align: center;
+    text {
+      font-size: 20rpx;
+    }
+    button::after {
+      border: none;
+    }
+    button {
+      display: inline;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 20rpx;
+      text-align: center;
+      text-decoration: none;
+      line-height: 2.55555556;
+      border-radius: 0px;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+      color: #747474;
+      background-color: #ffffff;
+    }
+  }
+}
+
+.userInfo {
+  flex: 1;
+  margin-left: 20rpx;
+  padding: 25rpx;
+  color: #949494;
+  background-color: #f3f3f3;
+  border-radius: 10rpx;
+  view {
+    font-size: 20rpx;
+    color: #949494;
+  }
+  .mid {
+    height: 22px;
+    line-height: 21px;
+    .icon {
+      font-size: 20rpx;
+      line-height: 20rpx;
+      padding: 0rpx;
+      min-width: 0rpx;
+      width: auto;
+      color: #747474;
+      &.active {
+        color: #dd0a18;
+      }
+    }
+    button {
+      background-color: #dd0b1a;
+      color: white;
+      // width: 100rpx;
+      height: 22px;
+      line-height: 21px;
+      display: inline-block;
+      vertical-align: -7px;
+      font-size: 20rpx;
+      margin-left: 27rpx;
+    }
+  }
+}
+
+.avatar {
+  display: inline-block;
+  position: relative;
+  width: 127rpx;
+  height: 127rpx;
+}
+.avatar__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.avatar__mold--circle {
+  border-radius: 50%;
+}
+.avatar__badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  z-index: 1;
+}
+
+.fr {
+  float: right;
+  height: 40rpx;
+  margin-right: -10px;
+  line-height: 40rpx;
+}
+
+.icon {
+  font-size: 20rpx;
+  line-height: 20rpx;
+  padding: 0rpx;
+  min-width: 0rpx;
+  width: auto;
+  color: #747474;
+  &.active {
+    color: #dd0a18;
+  }
+}
+
+.record {
+  margin-top: 10px;
+  padding: 30rpx;
+  background-color: #fff;
+
+  view {
+    height: 40px;
+    line-height: 40px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #e5e5e5;
+
+    image {
+      width: 30px;
+      height: 30px;
+      margin-top: 5px;
+      display: inline-block;
+      margin-right: 3px;
+    }
+
+    text {
+      flex: 5;
+    }
+
+    .price {
+      float: right;
+      flex: 4;
+      text-align: right;
+    }
+  }
+}
+
+.givePrice {
+  position: fixed;
+  bottom: 0;
+  color: white;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  background-color: #dd0b1a;
+}
+</style>

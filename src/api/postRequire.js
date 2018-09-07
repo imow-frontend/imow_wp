@@ -86,6 +86,12 @@ export default class postRequire extends base {
     return result
   }
 
+  static async addPrice(price, demandId) {
+    const url = `http://mock.eolinker.com/fviqSQE64e9172ca3f44fa3adab61ef5dabb2b45f271fc1?uri=addPrice`
+    const result = await this.post(url, {price, demandId})
+    return result
+  }
+
   static async uploadImg(files) {
     let promises = []
     const url = `${this.baseUrl}/Demand/UploadImg`

@@ -2,19 +2,19 @@
   <block>
     <NavBar title="发布" />
     <form bindsubmit="formSubmit" bindreset="formReset">
-      <view class="zan-panel gp">
+      <view class="zan-panel">
         <titleField :options="form_title" componentId="form_title" />
-        <tonnageField :options="form_tonnage" componentId="form_tonnage"  wx:if="{{showTonnage}}"/>
-          <priceField :options="form_price" componentId="form_price" />
+        <tonnageField :options="form_tonnage" componentId="form_tonnage" wx:if="{{showTonnage}}" />
+        <priceField :options="form_price" componentId="form_price" wx:if="{{!isAuction}}"/>
         <!-- ------------------------ 联系人 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">联系人</view>
-          <input type="text" name="contactName" value="{{user.infoName}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactName" bindinput="handleZanFieldChange"/>
+          <input type="text" name="contactName" value="{{user.infoName}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactName" bindinput="handleZanFieldChange" />
         </view>
         <!-- ------------------------ 联系电话 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">联系电话</view>
-          <input type="number" name="contactMobile" value="{{user.infoMobile}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange"/>
+          <input type="number" name="contactMobile" value="{{user.infoMobile}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange" />
         </view>
         <!-- ------------------------ 品牌 ---------------------------- -->
         <view class="zan-cell zan-field" wx:if="{{showBrand}}">
@@ -44,8 +44,48 @@
           </picker>
         </view>
         <detailField :options="form_detail" componentId="form_detail" />
+        <!-- ------------------------ 拍卖入口 ---------------------------- -->
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__hd zan-field__title">拍卖</view>
+          <switch checked bindchange="openAuction" color="#d70010" />
+        </view>
+        <!-- ------------------------ 拍卖表单 ---------------------------- -->
+        <view wx:if="{{isAuction}}">
+          <!-- ------------------------ 起拍价 ---------------------------- -->
+           <priceField :options="form_price" componentId="form_price"/>
+          <!-- ------------------------ 加价幅度 ---------------------------- -->
+           <priceIncreaseField :options="form_priceIncrease" componentId="form_priceIncrease"/>
+          <!-- ------------------------ 开拍时间 ---------------------------- -->
+          <view class="zan-cell zan-field">
+            <view class="zan-cell__hd zan-field__title">开拍时间</view>
+            <picker class="zan-field__input zan-cell__bd" mode="date"  start="09:01" end="18:00" data-flag="startDate" bindchange="handleAuction">
+              <view class="picker">
+                日期：{{auction.startDate}}
+              </view>
+            </picker>
+            <picker class="zan-field__input zan-cell__bd" mode="time"  start="09:01" end="18:00" data-flag="startTime" bindchange="handleAuction">
+              <view class="picker">
+                时间：{{auction.startTime}}
+              </view>
+            </picker>
+          </view>
+          <!-- ------------------------ 结束时间 ---------------------------- -->
+          <view class="zan-cell zan-field">
+            <view class="zan-cell__hd zan-field__title">结束时间</view>
+            <picker class="zan-field__input zan-cell__bd" mode="date"  start="09:01" ebd="18:00" data-flag="endDate" bindchange="handleAuction">
+              <view class="picker">
+                日期：{{auction.endDate}}
+              </view>
+            </picker>
+            <picker class="zan-field__input zan-cell__bd" mode="time" start="09:01" ebd="18:00" data-flag="endTime" bindchange="handleAuction">
+              <view class="picker">
+                时间：{{auction.endTime}}
+              </view>
+            </picker>
+          </view>
+        </view>
       </view>
-      <view class="imageWapper">
+      <view class="imageWapper gp" wx:if="{{showImage}}">
         <repeat for="{{files}}" key="index" index="index" item="file">
           <view class="re">
             <view class="weui-uploader__file" bindtap="previewImage" id="{{file}}">
@@ -70,6 +110,7 @@
 <script>
 import wepy from 'wepy'
 import zanField from '../components/zanui/zan-field'
+import switchBtn from '../components/zanui/zan-switch'
 import base from '../mixins/base'
 import router from '../mixins/router'
 import input from '../mixins/input'
@@ -86,7 +127,16 @@ import postRequire from '../api/postRequire'
 export default class PostNews extends wepy.page {
   data = {
     posting: false,
-    brandRange: ['中力', '杭叉', '合力', '林德', '龙工', '科朗', '丰田', '比亚迪', '其他'],
+    brandRange: [
+      '中力',
+      '杭叉',
+      '合力',
+      '林德',
+      '龙工',
+      '科朗',
+      '丰田',
+      '比亚迪'
+    ],
     newRange: ['全新', '9.5新', '9新', '8新', '5新', '其他'],
     brand: '',
     _new: '',
@@ -109,7 +159,20 @@ export default class PostNews extends wepy.page {
       name: 'price',
       title: '价格'
     },
-    files: []
+    form_priceIncrease: {
+      name: 'priceIncrease',
+      title: '加价幅度'
+    },
+    files: [],
+    // 拍卖的按钮
+    isAuction: true,
+    // 拍卖的信息
+    auction: {
+      startDate: '',
+      startTime: '',
+      endDate: '',
+      endTime: ''
+    }
   };
   components = {
     detailField: zanField,
@@ -117,12 +180,14 @@ export default class PostNews extends wepy.page {
     brandField: zanField,
     tonnageField: zanField,
     priceField: zanField,
+    priceIncreaseField: zanField,
     newField: zanField,
     areaField: zanField,
     contactNameField: zanField,
     contactMobileField: zanField,
     NavBar,
-    Icon
+    Icon,
+    switchBtn
   };
   methods = {
     previewImage: function(e) {
@@ -159,15 +224,17 @@ export default class PostNews extends wepy.page {
      */
     async formSubmit() {
       const title = this.input['form_title']
-      let tonnage = (this.showTonnage && this.input['form_tonnage']) || 'undefined'
+      let tonnage =
+        (this.showTonnage && this.input['form_tonnage']) || 'undefined'
       let price = this.input['form_price'] || 'undefined'
       const contactName = this.input['form_contactName'] || this.user.infoName
-      const contactMobile = this.input['form_contactMobile'] || this.user.infoMobile
+      const contactMobile =
+        this.input['form_contactMobile'] || this.user.infoMobile
       let brand = (this.showBrand && this.brand) || 'undefined'
       let _new = (this.showNew && this._new) || 'undefined'
       const area = this.area
       const detail = this.input['form_detail']
-      const files = this.files
+      const files = (this.showImage && this.files) || 'undefined'
       const type = this.postType
       const rules = [
         {
@@ -223,8 +290,8 @@ export default class PostNews extends wepy.page {
         {
           value: files,
           method: 'rangelength',
-          message: '上传1到10个图片',
-          param: [0, 10]
+          message: '上传3到9张图片',
+          param: [3, 9]
         }
       ]
       if (!this.check(rules)) {
@@ -238,9 +305,12 @@ export default class PostNews extends wepy.page {
 
         Tips.loading('上传中..')
         this.posting = true
-        const fileResult = await postRequire.uploadImg(files)
-        let images = fileResult.join(',')
-        const data = await postRequire.add({
+        let images = null
+        if (this.showImage) {
+          const fileResult = await postRequire.uploadImg(files)
+          images = fileResult.join(',')
+        }
+        const postData = {
           title,
           tonnage,
           contactName,
@@ -251,8 +321,15 @@ export default class PostNews extends wepy.page {
           detail,
           type,
           images,
-          price
-        })
+          price,
+          isAuction: this.isAuction
+        }
+        if (this.isAuction) {
+          postData.startTime = `${this.startDate} ${this.startTime}`
+          postData.endTime = `${this.endDate} ${this.endTime}`
+          postData.priceIncrease = this.input['form_priceIncrease']
+        }
+        const data = await postRequire.add(postData)
         if (data.status === 0) {
           Tips.success('已提交系统审核', 3000)
         }
@@ -281,6 +358,31 @@ export default class PostNews extends wepy.page {
 
       return this.$emit('zanFieldChange', event)
     },
+    /**
+     * 打开拍卖的
+     */
+    openAuction(event) {
+      // 控制拍卖信息的显示
+      this.isAuction = !this.isAuction
+    },
+    handleAuction(event) {
+      let timeFlag = event.target.dataset.flag
+      switch (timeFlag) {
+      case 'startDate':
+        this.auction.startDate = event.detail.value
+        break
+      case 'startTime':
+        this.auction.startTime = event.detail.value
+        break
+      case 'endDate':
+        this.auction.endDate = event.detail.value
+        break
+      case 'endTime':
+        this.auction.endTime = event.detail.value
+        break
+      }
+      console.log(timeFlag)
+    }
   };
   mixins = [base, input, router];
   async onLoad() {
@@ -290,7 +392,7 @@ export default class PostNews extends wepy.page {
   onShow() {
     base.injectionParas.call(this)
   }
-  computed={
+  computed = {
     showNew() {
       return this.postType === '1'
     },
@@ -299,8 +401,11 @@ export default class PostNews extends wepy.page {
     },
     showBrand() {
       return this.postType === '1' || this.postType === '6'
+    },
+    showImage() {
+      return this.postType !== '4'
     }
-  }
+  };
 }
 </script>
 
@@ -308,7 +413,7 @@ export default class PostNews extends wepy.page {
 @import "../zanui/panel.scss";
 @import "../zanui/btn.scss";
 .gp {
-  border-bottom: 20rpx solid #e8e8e8;
+  border-top: 20rpx solid #e8e8e8;
 }
 .imageWapper {
   display: flex;
