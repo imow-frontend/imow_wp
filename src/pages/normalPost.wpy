@@ -5,6 +5,7 @@
       <view class="zan-panel gp">
         <titleField :options="form_title" componentId="form_title" />
         <tonnageField :options="form_tonnage" componentId="form_tonnage"  wx:if="{{showTonnage}}"/>
+          <priceField :options="form_price" componentId="form_price" />
         <!-- ------------------------ 联系人 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">联系人</view>
@@ -85,7 +86,7 @@ import postRequire from '../api/postRequire'
 export default class PostNews extends wepy.page {
   data = {
     posting: false,
-    brandRange: ['中力', '杭叉', '合力', '林德', '龙工', '科朗', '丰田', '比亚迪'],
+    brandRange: ['中力', '杭叉', '合力', '林德', '龙工', '科朗', '丰田', '比亚迪', '其他'],
     newRange: ['全新', '9.5新', '9新', '8新', '5新', '其他'],
     brand: '',
     _new: '',
@@ -104,7 +105,10 @@ export default class PostNews extends wepy.page {
       name: 'tonnage',
       title: '吨位'
     },
-
+    form_price: {
+      name: 'price',
+      title: '价格'
+    },
     files: []
   };
   components = {
@@ -112,6 +116,7 @@ export default class PostNews extends wepy.page {
     titleField: zanField,
     brandField: zanField,
     tonnageField: zanField,
+    priceField: zanField,
     newField: zanField,
     areaField: zanField,
     contactNameField: zanField,
@@ -155,6 +160,7 @@ export default class PostNews extends wepy.page {
     async formSubmit() {
       const title = this.input['form_title']
       let tonnage = (this.showTonnage && this.input['form_tonnage']) || 'undefined'
+      let price = this.input['form_price'] || 'undefined'
       const contactName = this.input['form_contactName'] || this.user.infoName
       const contactMobile = this.input['form_contactMobile'] || this.user.infoMobile
       let brand = (this.showBrand && this.brand) || 'undefined'
@@ -244,7 +250,8 @@ export default class PostNews extends wepy.page {
           area,
           detail,
           type,
-          images
+          images,
+          price
         })
         if (data.status === 0) {
           Tips.success('已提交系统审核', 3000)

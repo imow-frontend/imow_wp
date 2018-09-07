@@ -31,6 +31,7 @@ export default class auth extends base {
     result.imowUser = userInfo.imowUser
     result.infoName = userInfo.infoName
     result.infoMobile = userInfo.infoMobile
+    result.dlr = userInfo.dlr
     await this.setSession(userInfo.thirdSession)
     const userInfoRaw = await this.userInfo()
     result.nickName = userInfoRaw.userInfo.nickName
@@ -72,7 +73,7 @@ export default class auth extends base {
         return {
           userInfo: {
             nickName: '阿母工业会员',
-            avatarUrl: 'http://pavr51yat.bkt.clouddn.com/avatarUrl'
+            avatarUrl: 'http://pavr51yat.bkt.clouddn.com/avatarUrl?t=1'
           }
         }
       }
