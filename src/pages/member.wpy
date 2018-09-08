@@ -9,6 +9,10 @@
             <button class="zan-btn zan-btn--primary zan-btn--mini">登陆并绑定微信号</button>
           </navigator>
         </block>
+        <block wx:if="{{user.imowUser}}">
+          <view class="acount">账号名:13282822564</view>
+          <button class="zan-btn zan-btn--primary zan-btn--mini" @tap="loginOut">解绑阿母账号</button>
+        </block>
       </view>
       <view class="right">
         <Avatar class="avatar" />
@@ -51,15 +55,18 @@
 
 <script>
   import wepy from 'wepy'
-  import router from '../mixins/router'
-  import NavBar from '../components/NavBar'
-  import Avatar from '../components/share/avatar'
-  import Icon from '../components/Icon'
-  import {
+import router from '../mixins/router'
+import NavBar from '../components/NavBar'
+import Avatar from '../components/share/avatar'
+import Icon from '../components/Icon'
+import Tips from '../utils/Tips'
+  import memberApi from '../api/member'
+
+import {
     connect
   } from 'wepy-redux'
-  import store from '../store/utils'
-  @connect({
+import store from '../store/utils'
+@connect({
     user: store.get('user')
   })
   export default class Member extends wepy.page {
@@ -71,7 +78,22 @@
       gzIcon: Icon,
       zIcon: Icon
     };
-    methods = {};
+    methods = {
+      async loginOut() {
+        try {
+          await Tips.confirm(
+          '确定要解绑当前阿母账号吗',
+          {},
+          '解绑'
+        )
+          await memberApi.loginOut()
+          this.$apply()
+        } catch (error) {
+  
+        }
+  
+      }
+    };
     async onLoad() {
       await store.init()
       this.$apply()
@@ -84,8 +106,8 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../zanui/btn.scss';
-  @import '../zanui/cell.scss';
+  @import "../zanui/btn.scss";
+  @import "../zanui/cell.scss";
   .zan-btn--small {
     border-radius: 10rpx;
   }
@@ -113,6 +135,10 @@
     .name {
       font-size: 36rpx;
     }
+    .acount{
+      font-size: 24rpx;
+      margin-top: 3rpx;
+    }
     .left {
       margin-top: 15rpx;
       float: left;
@@ -126,6 +152,6 @@
     }
   }
   .gary {
-    color: #747474
+    color: #747474;
   }
 </style>

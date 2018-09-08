@@ -32,6 +32,12 @@ export default class postRequire extends base {
     })
   }
 
+  static async AuctionDetail(params) {
+    const url = `${this.baseUrl}/Demand/Detail`
+    const result = await this.post(url, params)
+    return result
+  }
+
   static async list(params = {}) {
     const url = `${this.baseUrl}/Demand/getList`
     const result = await this.post(url, params)

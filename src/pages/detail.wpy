@@ -3,10 +3,11 @@
     <NavBar></NavBar>
     <view class="ctn">
       <!-- 倒计时条 -->
-      <view class="clock">
+      <!-- <view class="clock">
         <block wx:if="{{status}}">距离拍卖开始</block>
         <block wx:else>距离拍卖结束 3小时19分钟15秒</block>
-      </view>
+      </view> -->
+      <Countdown class="clock" startTime="1554678900000" endTime="1535680540000"/>
       <view class="article">
         <view class="title">
           <view class="avatar">
@@ -14,23 +15,27 @@
           </view>
           <view class="userInfo">
             <view class="name">
-              王金序
+              {{item.contactName}}
             </view>
             <view class="mid">
               <DIcon type="dingwei" />
-              <label class="pd">浙江杭州</label>
-              <button @tap="handleGivePrice">出个价</button>
+              <label class="pd">{{item.area}}</label>
+            </view>
+            <view class="bottom">
+              <label class="pd" wx:if="{{item.brand}}">品牌:{{item.brand}}</label>
+              <label class="pd" wx:if="{{item.tonnage}}">吨位:{{item.tonnage}}</label>
+              <label class="pd" wx:if="{{item.new}}">新旧程度:{{item.new}}</label>
             </view>
           </view>
         </view>
         <view class="productInfo">
-          <text class="name">内燃叉车</text>
+          <text class="name">{{item.title}}</text>
           <text class="detail">
-            叉车是工业搬运车辆，是指对成件托盘货物进行装卸、堆垛和短距离运输作业的各种轮式搬运车辆。国际标准化组织ISO/TC110称为工业车辆。常用于仓储大型物件的运输，通常使用燃油机或者电池驱动。
+            {{item.detail}}
           </text>
           <view class="imageCtn">
-            <repeat for="{{imageList}}" key="index" index="index" item="item">
-              <image src="{{item}}" />
+            <repeat  for="{{item.images}}" key="index" index="index" item="image">
+              <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" />
             </repeat>
           </view>
           <view class="btnWapper">
@@ -61,7 +66,7 @@
         <view>最近出价记录</view>
         <repeat for={{6}} key="index" index="index">
           <view>
-            <image src="http://dummyimage.com/20x20" />
+            <image src="http://pavr51yat.bkt.clouddn.com/avatarUrl" />
             <text>{{username}}</text>
             <text class="price">
               <block wx:if="{{index===0}}">历史最高价</block>￥31</text>
@@ -93,7 +98,14 @@ import NavBar from '../components/NavBar'
 import Icon from '../components/Icon'
 import Avatar from '../components/share/avatar'
 import postRequire from '../api/postRequire'
+import { connect } from 'wepy-redux'
+import store from '../store/utils'
+import Tips from '../utils/Tips'
+import Countdown from '../components/share/countdown'
 
+@connect({
+  user: store.get('user')
+})
 export default class Detail extends wepy.page {
   components = {
     NavBar,
@@ -103,22 +115,21 @@ export default class Detail extends wepy.page {
     FIcon: Icon,
     TIcon: Icon,
     GIcon: Icon,
-    Avatar
+    Avatar,
+    Countdown
   };
 
   data = {
-    isShow: true,
+    isShow: false,
     status: false,
-    imageList: [
-      'http://dummyimage.com/300x100',
-      'http://dummyimage.com/100x100',
-      'http://dummyimage.com/50x100'
-    ],
     item: {
       createTime: '2018-05-10',
       count: 5,
       isFollow: true,
-      id: '1101'
+      id: '1101',
+      brand: 'dd',
+      tonnage: 'dd',
+      new: 'dd'
     },
     username: '王金序',
     step: 10,
@@ -177,6 +188,16 @@ export default class Detail extends wepy.page {
       }
     }
   };
+
+  async onLoad(params) {
+    this.id = params.id
+   // Tips.loading('努力加载中')
+    // await store.init()
+
+    // await postRequire.AuctionDetail({
+    //   id: ''
+    // })
+  }
 }
 </script>
 
@@ -187,9 +208,10 @@ export default class Detail extends wepy.page {
 
 @keyframes sliderUp {
   from {
-    transform: translateY(100rpx)
-  } to {
-    transform: translateY(0rpx)
+    transform: translateY(100rpx);
+  }
+  to {
+    transform: translateY(0rpx);
   }
 }
 
@@ -200,12 +222,12 @@ export default class Detail extends wepy.page {
   top: 0;
 
   .mask {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  background-color: black;
-  opacity: 0.4;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: black;
+    opacity: 0.4;
   }
 
   .popupPaneCtn {
@@ -217,7 +239,7 @@ export default class Detail extends wepy.page {
     display: flex;
     flex-direction: column;
     padding-top: 20rpx;
-    animation: sliderUp .3s forwards;
+    animation: sliderUp 0.3s forwards;
     text {
       flex: 1;
       text-align: center;
@@ -227,11 +249,11 @@ export default class Detail extends wepy.page {
       padding: 20rpx;
 
       view {
-      background-color: #dd0b1a;
-      color: white;
-      font-size: 35rpx;
-      padding: 15rpx 0;
-      text-align: center;
+        background-color: #dd0b1a;
+        color: white;
+        font-size: 35rpx;
+        padding: 15rpx 0;
+        text-align: center;
       }
     }
 

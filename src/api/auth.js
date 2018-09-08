@@ -45,6 +45,19 @@ export default class auth extends base {
   /**
    * 执行登录操作
    */
+  static async doLoginOut() {
+    const url = `${this.baseUrl}/auth/loginOut`
+    try {
+      const result = await this.post(url)
+      return result
+    } catch (error) {
+      console.error(`[auth] 登出 error:${error}`)
+    }
+  }
+
+  /**
+   * 执行登录操作
+   */
   static async doLogin() {
     console.info(`[auth] start login `)
     const { code } = await wepy.login()

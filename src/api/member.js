@@ -1,6 +1,5 @@
 import base from './base'
 import auth from './auth'
-import wepy from 'wepy'
 import store from '../store/utils'
 
 export default class member extends base {
@@ -17,6 +16,18 @@ export default class member extends base {
       await this.setLoginTag(result.user)
       return true
     }
+  }
+
+    /**
+   * 登录
+   */
+  static async loginOut() {
+    const result = await auth.doLoginOut()
+    if (result && result.status === 20) {
+      await this.setLoginTag(result.user)
+      return true
+    }
+    return true
   }
 
   static async setLoginTag(user) {
