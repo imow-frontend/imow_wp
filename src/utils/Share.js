@@ -1,5 +1,4 @@
 export default function onShareAppMessage (res) {
-  debugger
   let title = ''
   let path = ''
   let image = ''

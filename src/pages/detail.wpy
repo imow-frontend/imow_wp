@@ -66,10 +66,11 @@
         <view>最近出价记录</view>
         <repeat for={{6}} key="index" index="index">
           <view>
-            <image src="http://pavr51yat.bkt.clouddn.com/avatarUrl" />
             <text>{{username}}</text>
             <text class="price">
-              <block wx:if="{{index===0}}">历史最高价</block>￥31</text>
+              <block wx:if="{{index===0}}">历史最高价</block>￥31
+              </text>
+              <button class="zan-btn zan-btn--primary zan-btn--mini mt20" >联系他</button>
           </view>
         </repeat>
       </view>
@@ -120,6 +121,7 @@ export default class Detail extends wepy.page {
   };
 
   data = {
+    isEnd: false,
     isShow: false,
     status: false,
     item: {
@@ -177,7 +179,7 @@ export default class Detail extends wepy.page {
     },
 
     async addPrice() {
-      let res = await postRequire.addPrice(this.currentPrice)
+      let res = await postRequire.addPrice(this.currentPrice, this.id)
       console.log(res)
       if (res.status) {
         wx.showToast({
@@ -186,12 +188,24 @@ export default class Detail extends wepy.page {
           duration: 2000
         })
       }
+    },
+    async getAuctionBid() {
+      if (!this.isEnd) {
+        // let result = await postRequire.GetBid({demandId: this.id})
+        setTimeout(this.methods.bindThis(this), 3000)
+      }
+    },
+    bindThis(self) {
+      return function() {
+        self.methods.getAuctionBid.apply(self)
+      }
     }
   };
 
   async onLoad(params) {
     this.id = params.id
-   // Tips.loading('努力加载中')
+    this.methods.getAuctionBid.apply(this)
+    // Tips.loading('努力加载中')
     // await store.init()
 
     // await postRequire.AuctionDetail({
@@ -202,6 +216,11 @@ export default class Detail extends wepy.page {
 </script>
 
 <style lang="scss" scoped>
+@import "../zanui/btn.scss";
+.mt20{
+  margin-top: 20rpx;
+  margin-left: 5rpx;
+}
 .page {
   overflow: hidden;
 }

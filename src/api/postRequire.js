@@ -38,6 +38,12 @@ export default class postRequire extends base {
     return result
   }
 
+  static async GetBid(params) {
+    const url = `${this.baseUrl}/Demand/GetBid`
+    const result = await this.post(url, params)
+    return result
+  }
+
   static async list(params = {}) {
     const url = `${this.baseUrl}/Demand/getList`
     const result = await this.post(url, params)
@@ -93,7 +99,7 @@ export default class postRequire extends base {
   }
 
   static async addPrice(price, demandId) {
-    const url = `http://mock.eolinker.com/fviqSQE64e9172ca3f44fa3adab61ef5dabb2b45f271fc1?uri=addPrice`
+    const url = `${this.baseUrl}/Demand/AddPrice`
     const result = await this.post(url, {price, demandId})
     return result
   }
