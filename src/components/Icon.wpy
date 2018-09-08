@@ -14,13 +14,14 @@ export default class Icon extends wepy.component {
 <style lang="scss">
 @import "../static/styles/variable";
 
+
 @font-face {
   font-family: 'iconfont';  /* project id 717791 */
-  src: url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.eot');
-  src: url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.woff') format('woff'),
-  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_717791_yjqo7nfqzk.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_717791_8nq6n5jsyx.eot');
+  src: url('//at.alicdn.com/t/font_717791_8nq6n5jsyx.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_717791_8nq6n5jsyx.woff') format('woff'),
+  url('//at.alicdn.com/t/font_717791_8nq6n5jsyx.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_717791_8nq6n5jsyx.svg#iconfont') format('svg');
 }
 @mixin icon-size($size){
   line-height: $size;
@@ -88,5 +89,5 @@ export default class Icon extends wepy.component {
 
 .icon-chache:before { content: "\e61c"; }
 
-
+.icon-jiagebaohu:before { content: "\e604"; }
 </style>

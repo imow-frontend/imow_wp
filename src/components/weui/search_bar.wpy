@@ -65,6 +65,7 @@
         setTimeout(() => {
           this.inputVal = ''
           this.$apply()
+          this.methods.search.apply(this)
         })
       },
       inputTyping(e) {

@@ -7,7 +7,7 @@
           <view class="item">
             <view class="up">
               <view class="avatar">
-                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+                <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl?t=1); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
               </view>
               <view class="userInfo">
                 <view class="name">
@@ -16,7 +16,9 @@
                 <view class="mid">
                   <DIcon type="dingwei" />
                   <label class="pd">{{item.area}}</label>
-                  <block wx:if="{{user.imowUser}}">
+                  <block wx:if="{{user.imowUser && user.dlr}}">
+                    <PIcon type="jiagebaohu" class="iconColor" />
+                    <label class="pd">{{item.price || '面议'}}</label>
                     <BIcon type="bohao" class="dia" />
                     <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
                   </block>
@@ -27,7 +29,7 @@
                 <view class="bottom">
                   <label class="pd" wx:if="{{item.brand}}">品牌:{{item.brand}}</label>
                   <label class="pd" wx:if="{{item.tonnage}}">吨位:{{item.tonnage}}</label>
-                  <label class="pd" wx:if="{{item.new}}">新旧程度:{{item.new}}</label>
+                  <label class="pd" wx:if="{{item.New}}">新旧程度:{{item.New}}</label>
                 </view>
               </view>
             </view>
@@ -109,7 +111,8 @@ export default class List extends wepy.component {
     TIcon: Icon,
     CIcon: Icon,
     GIcon: Icon,
-    FIcon: Icon
+    FIcon: Icon,
+    PIcon: Icon
   };
   mixins = [router];
   props = {
@@ -132,7 +135,7 @@ export default class List extends wepy.component {
     yyx: async function(e) {
       try {
         await Tips.confirm(
-          '您现在没有绑定阿母账号,无法看到对方的手机号码,只能添加意向,我们会帮您联系对方。如果希望直接联系对方请使用阿母账号登录',
+          '请耐心等待车主联系你。',
           {},
           '我有意向'
         )
@@ -198,6 +201,7 @@ export default class List extends wepy.component {
 
 <style lang="scss">
 @import "../../zanui/btn.scss";
+
 .mid .yyx {
   width: 130rpx;
 }
@@ -217,6 +221,9 @@ export default class List extends wepy.component {
     &.active {
       color: #dd0a18;
     }
+  }
+  .icon-jiagebaohu {
+    color: #240507;
   }
 }
 .noMsg {
@@ -249,9 +256,11 @@ export default class List extends wepy.component {
     text {
       font-size: 20rpx;
     }
-    button::after{ border: none; }
+    button::after {
+      border: none;
+    }
     button {
-      display:inline;
+      display: inline;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -321,7 +330,7 @@ export default class List extends wepy.component {
     color: #949494;
   }
   .pd {
-    padding-right: 27rpx;
+    padding-right: 25rpx;
   }
   label {
     vertical-align: baseline;
