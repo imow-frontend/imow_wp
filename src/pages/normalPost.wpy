@@ -5,7 +5,7 @@
       <view class="zan-panel">
         <titleField :options="form_title" componentId="form_title" />
         <tonnageField :options="form_tonnage" componentId="form_tonnage" wx:if="{{showTonnage}}" />
-        <priceField :options="form_price" componentId="form_price" wx:if="{{!isAuction}}"/>
+        <priceField :options="form_price" componentId="form_price" wx:if="{{!isAuction}}" />
         <!-- ------------------------ 联系人 ---------------------------- -->
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">联系人</view>
@@ -44,46 +44,49 @@
           </picker>
         </view>
         <detailField :options="form_detail" componentId="form_detail" />
-        <!-- ------------------------ 拍卖入口 ---------------------------- -->
-        <view class="zan-cell zan-field">
-          <view class="zan-cell__hd zan-field__title">拍卖</view>
-          <switch checked bindchange="openAuction" color="#d70010" />
-        </view>
-        <!-- ------------------------ 拍卖表单 ---------------------------- -->
-        <view wx:if="{{isAuction}}">
-          <!-- ------------------------ 起拍价 ---------------------------- -->
-           <priceField :options="form_price" componentId="form_price"/>
-          <!-- ------------------------ 加价幅度 ---------------------------- -->
-           <priceIncreaseField :options="form_priceIncrease" componentId="form_priceIncrease"/>
-          <!-- ------------------------ 开拍时间 ---------------------------- -->
+        <block wx:if="{{password}}">
+          <!-- ------------------------ 拍卖入口 ---------------------------- -->
           <view class="zan-cell zan-field">
-            <view class="zan-cell__hd zan-field__title">开拍时间</view>
-            <picker class="zan-field__input zan-cell__bd" mode="date"  start="09:01" end="18:00" data-flag="startDate" bindchange="handleAuction">
-              <view class="picker">
-                日期：{{auction.startDate}}
-              </view>
-            </picker>
-            <picker class="zan-field__input zan-cell__bd" mode="time"  start="09:01" end="18:00" data-flag="startTime" bindchange="handleAuction">
-              <view class="picker">
-                时间：{{auction.startTime}}
-              </view>
-            </picker>
+            <view class="zan-cell__hd zan-field__title">拍卖</view>
+            <switch bindchange="openAuction" color="#d70010" />
           </view>
-          <!-- ------------------------ 结束时间 ---------------------------- -->
-          <view class="zan-cell zan-field">
-            <view class="zan-cell__hd zan-field__title">结束时间</view>
-            <picker class="zan-field__input zan-cell__bd" mode="date"  start="09:01" ebd="18:00" data-flag="endDate" bindchange="handleAuction">
-              <view class="picker">
-                日期：{{auction.endDate}}
-              </view>
-            </picker>
-            <picker class="zan-field__input zan-cell__bd" mode="time" start="09:01" ebd="18:00" data-flag="endTime" bindchange="handleAuction">
-              <view class="picker">
-                时间：{{auction.endTime}}
-              </view>
-            </picker>
+          <!-- ------------------------ 拍卖表单 ---------------------------- -->
+          <view wx:if="{{isAuction}}">
+            <!-- ------------------------ 起拍价 ---------------------------- -->
+            <priceField :options="form_price" componentId="form_price" />
+            <!-- ------------------------ 加价幅度 ---------------------------- -->
+            <priceIncreaseField :options="form_priceIncrease" componentId="form_priceIncrease" />
+            <!-- ------------------------ 开拍时间 ---------------------------- -->
+            <view class="zan-cell zan-field">
+              <view class="zan-cell__hd zan-field__title">开拍时间</view>
+              <picker class="zan-field__input zan-cell__bd" mode="date" data-flag="startDate" bindchange="handleAuction">
+                <view class="picker">
+                  日期：{{auction.startDate}}
+                </view>
+              </picker>
+              <picker class="zan-field__input zan-cell__bd" mode="time" data-flag="startTime" bindchange="handleAuction">
+                <view class="picker">
+                  时间：{{auction.startTime}}
+                </view>
+              </picker>
+            </view>
+            <!-- ------------------------ 结束时间 ---------------------------- -->
+            <view class="zan-cell zan-field">
+              <view class="zan-cell__hd zan-field__title">结束时间</view>
+              <picker class="zan-field__input zan-cell__bd" mode="date" data-flag="endDate" bindchange="handleAuction">
+                <view class="picker">
+                  日期：{{auction.endDate}}
+                </view>
+              </picker>
+              <picker class="zan-field__input zan-cell__bd" mode="time" data-flag="endTime" bindchange="handleAuction">
+                <view class="picker">
+                  时间：{{auction.endTime}}
+                </view>
+              </picker>
+            </view>
           </view>
-        </view>
+        </block>
+
       </view>
       <view class="imageWapper gp" wx:if="{{showImage}}">
         <repeat for="{{files}}" key="index" index="index" item="file">
@@ -126,6 +129,7 @@ import postRequire from '../api/postRequire'
 })
 export default class PostNews extends wepy.page {
   data = {
+    password: false,
     posting: false,
     brandRange: [
       '中力',
@@ -144,7 +148,7 @@ export default class PostNews extends wepy.page {
     postType: 1,
     form_detail: {
       name: 'detail',
-      placeholder: '请填写产品的描述信息',
+      placeholder: '描述或者照片中出现电话号码的信息将会被系统自动删除,如发现您的信息被删除请重新发布',
       type: 'textarea'
     },
     form_title: {
@@ -165,7 +169,7 @@ export default class PostNews extends wepy.page {
     },
     files: [],
     // 拍卖的按钮
-    isAuction: true,
+    isAuction: false,
     // 拍卖的信息
     auction: {
       startDate: '',
@@ -236,6 +240,9 @@ export default class PostNews extends wepy.page {
       const detail = this.input['form_detail']
       const files = (this.showImage && this.files) || 'undefined'
       const type = this.postType
+      if (title === '阿母工业' && detail === 'ep-ep.com') {
+        this.password = true
+      }
       const rules = [
         {
           value: title,
@@ -325,8 +332,10 @@ export default class PostNews extends wepy.page {
           isAuction: this.isAuction
         }
         if (this.isAuction) {
-          postData.startTime = `${this.startDate} ${this.startTime}`
-          postData.endTime = `${this.endDate} ${this.endTime}`
+          postData.startTime = `${this.auction.startDate} ${
+            this.auction.startTime
+          }`
+          postData.endTime = `${this.auction.endDate} ${this.auction.endTime}`
           postData.priceIncrease = this.input['form_priceIncrease']
         }
         const data = await postRequire.add(postData)

@@ -10,7 +10,7 @@
           </navigator>
         </block>
         <block wx:if="{{user.imowUser}}">
-          <view class="acount">账号名:13282822564</view>
+          <view class="acount">账号名:{{user.loginName}}</view>
           <button class="zan-btn zan-btn--primary zan-btn--mini" @tap="loginOut">解绑阿母账号</button>
         </block>
       </view>

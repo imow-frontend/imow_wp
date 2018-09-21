@@ -20,9 +20,11 @@ export default class extends wepy.app {
   config = {
     pages: [
       // 'pages/authorization',
-      'pages/detail',
-      'pages/normalPost',
       'pages/index',
+      'pages/normalPost',
+      'pages/detail',
+      // 'pages/normalPost',
+      
       'pages/publicList',
       'pages/editDetail',
       'pages/member',

@@ -16,15 +16,19 @@
                 <view class="mid">
                   <DIcon type="dingwei" />
                   <label class="pd">{{item.area}}</label>
-                  <block wx:if="{{user.imowUser && user.dlr}}">
-                    <PIcon type="jiagebaohu" class="iconColor" />
-                    <label class="pd">{{item.price || '面议'}}</label>
-                    <BIcon type="bohao" class="dia" />
-                    <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
+                  <block wx:if="{{item.isAuction}}">
+                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="qjp" data-did="{{item.id}}">去竞拍</button>
                   </block>
                   <block wx:else>
-                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="qjp" data-did="{{item.id}}" wx:if="{{item.isAuction}}">去竞拍</button>
-                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}" wx:else>有意向</button>
+                    <block wx:if="{{user.imowUser && user.dlr}}">
+                      <PIcon type="jiagebaohu" class="iconColor" />
+                      <label class="pd">{{item.price || '面议'}}</label>
+                      <BIcon type="bohao" class="dia" />
+                      <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
+                    </block>
+                    <block wx:else>
+                      <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                    </block>
                   </block>
                 </view>
                 <view class="bottom">
@@ -133,16 +137,13 @@ export default class List extends wepy.component {
     return result
   }
   methods = {
-    qjp: function() {
-      wx.navigateTo({url: `/pages/detail`})
+    qjp: function(e) {
+      const id = e.currentTarget.dataset.did
+      wx.navigateTo({ url: `/pages/detail?id=${id}` })
     },
     yyx: async function(e) {
       try {
-        await Tips.confirm(
-          '请耐心等待车主联系你。',
-          {},
-          '我有意向'
-        )
+        await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
         if (!this.user.infoName || !this.user.infoMobile) {
           this.routeEditDetail()
           return

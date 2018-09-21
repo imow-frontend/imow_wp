@@ -32,6 +32,7 @@ export default class auth extends base {
     result.infoName = userInfo.infoName
     result.infoMobile = userInfo.infoMobile
     result.dlr = userInfo.dlr
+    result.loginName = userInfo.loginName
     await this.setSession(userInfo.thirdSession)
     const userInfoRaw = await this.userInfo()
     result.nickName = userInfoRaw.userInfo.nickName

@@ -46,6 +46,9 @@
         scroll: true,
         height: 80,
         list: [{
+          title: '拍卖',
+          id: '-1'
+        }, {
           title: '全部',
           id: '0'
         },
