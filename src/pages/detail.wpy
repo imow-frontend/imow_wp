@@ -126,7 +126,7 @@
                 </view>
                 <view class="right">
                   <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
-                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}"  @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
                 </view>
               </view>
               <view>{{ctn.text}}</view>
@@ -209,6 +209,14 @@ export default class Detail extends wepy.page {
   };
   mixins = [router];
   methods = {
+    // 拨打电话
+    ringUp(e) {
+      let phone = e.currentTarget.dataset.phone
+      wx.makePhoneCall({
+        phoneNumber: phone
+      })
+    },
+
     // 删除留言
     async  deleteMsg(e) {
       let id = e.currentTarget.dataset.id
