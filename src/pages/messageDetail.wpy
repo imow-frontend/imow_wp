@@ -1,0 +1,475 @@
+<template>
+  <view>
+    <NavBar title="需求详情" />
+    <SearchBar showHotSearch="{{showHotSearch}}" />
+    <view class="item">
+      <view class="up">
+        <view class="avatar">
+          <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl?t=1); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
+        </view>
+        <view class="userInfo">
+          <view class="name">
+            {{item.contactName}}
+          </view>
+          <view class="mid">
+            <DIcon type="dingwei" />
+            <label class="pd">{{item.area}}</label>
+            <block wx:if="{{item.isAuction}}">
+              <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="qjp" data-did="{{item.id}}">去竞拍</button>
+            </block>
+            <block wx:else>
+              <block wx:if="{{user.imowUser && user.dlr}}">
+                <PIcon type="jiagebaohu" class="iconColor" />
+                <label class="pd">{{item.price || '面议'}}</label>
+                <BIcon type="bohao" class="dia" />
+                <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
+              </block>
+              <block wx:else>
+                <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+              </block>
+            </block>
+          </view>
+          <view class="bottom">
+            <label class="pd" wx:if="{{item.brand}}">品牌:{{item.brand}}</label>
+            <label class="pd" wx:if="{{item.tonnage}}">吨位:{{item.tonnage}}</label>
+            <label class="pd" wx:if="{{item.New}}">新旧程度:{{item.New}}</label>
+          </view>
+        </view>
+      </view>
+      <view class="dowm">
+        <view class="productInfo">
+          <view class="proName">
+            <text>{{item.title}}</text>
+          </view>
+          <view class="detail">
+            <text>{{item.detail}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="imgWapper">
+        <repeat for="{{item.images}}" key="index" index="index" item="image">
+          <image mode="widthFix" src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" @tap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
+        </repeat>
+      </view>
+      <view class="btnWapper">
+        <view class="btnItem" style="flex: 1.3;">
+          <view>
+            <TIcon type="shijian" />
+            <text> {{item.createTime}}</text>
+            <!-- <FIcon type="fenge fr" /> -->
+          </view>
+        </view>
+        <view class="btnItem">
+          <CIcon type="chakan" />
+          <text> {{item.count}}次</text>
+          <!-- <FIcon type="fenge fr" /> -->
+        </view>
+        <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
+          <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
+          <text> {{item.isFollow?'取消关注':'关注'}}</text>
+          <!-- <FIcon type="fenge fr" /> -->
+        </view>
+        <view class="btnItem">
+          <button open-type="share" data-did="{{item.id}}" data-title="{{item.title}}" data-image="{{item.images[0]}}">分享</button>
+          <!-- <FIcon type="fenge fr" /> -->
+        </view>
+        <view class="btnItem" @tap="addMsg" data-id="{{item.id}}">
+          <text>留言</text>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{msgList.length}}" class="message">
+        <view>留言板</view>
+        <repeat for="{{msgList}}" key="index" index="index" item="ctn">
+          <view class="message-item">
+            <view>{{index}}</view>
+            <view class="messageCtn">
+              <view class="ctn-item">
+                <view class="left">
+                  <view>{{ctn.name}}</view>
+                  <view class="time">{{ctn.createTime}}</view>
+                </view>
+                <view class="right">
+                  <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
+                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                </view>
+              </view>
+              <view>{{ctn.text}}</view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import NavBar from '../components/NavBar'
+import Icon from '../components/Icon'
+import Avatar from '../components/share/avatar'
+import postRequire from '../api/postRequire'
+import { connect } from 'wepy-redux'
+import store from '../store/utils'
+import Tips from '../utils/Tips'
+import router from '../mixins/router'
+
+import onShareAppMessage from '../utils/Share'
+
+@connect({
+  user: store.get('user')
+})
+
+export default class Index extends wepy.page {
+  components = {
+    NavBar,
+    BIcon: Icon,
+    CIcon: Icon,
+    DIcon: Icon,
+    FIcon: Icon,
+    TIcon: Icon,
+    GIcon: Icon,
+    Avatar
+  };
+  data = {
+    item: {},
+    msgList: [],
+    page: 1
+  };
+  mixins = [router];
+  methods = {
+    // 拨打电话
+    ringUp(e) {
+      let phone = e.currentTarget.dataset.phone
+      wx.makePhoneCall({
+        phoneNumber: phone
+      })
+    },
+
+    // 跳转到添加留言页面
+    async addMsg(e) {
+      if (!this.user.infoName || !this.user.infoMobile) {
+        await Tips.confirm('您没有添加个人联系方式。', {}, '去添加')
+        this.routeEditDetail()
+        return
+      }
+      let id = e.currentTarget.dataset.id
+      wx.navigateTo({
+        url: '/pages/edit?id=' + id
+      })
+    },
+
+    // 删除留言
+    async  deleteMsg(e) {
+      let id = e.currentTarget.dataset.id
+      let res = await postRequire.DeleteMessage(id)
+      if (res.status === 0) {
+        wx.showToast({
+          title: '删除成功！',
+          icon: 'success'
+        })
+        // 删除成功以后将此条内容从列表中删除
+        let tempArray = this.msgList
+        tempArray.forEach((element, index) => {
+          if (element.id === id) {
+            tempArray.splice(index, 1)
+          }
+        })
+        this.msgList = tempArray
+        this.$apply()
+      } else {
+        wx.showToast({
+          title: '删除失败！',
+          image: '/static/images/icon/error.png'
+        })
+      }
+    },
+  };
+
+  async onLoad(params) {
+    Tips.loading('努力加载中')
+    this.id = params.id
+    let res = await postRequire.AuctionDetail({id: params.id})
+    this.item = res[0]
+    this.$apply()
+    Tips.loaded()
+  }
+
+  // 上拉加载
+  async onReachBottom() {
+    wx.showLoading({
+      title: '拼命加载中'
+    })
+    // 设置page
+    let page = this.page + 1
+    let res = await postRequire.GetMessageList(String(this.id), page)
+    // 保存有效数据
+    let tempList = res.list
+    if (tempList.length === 0) {
+      wx.showToast({
+        title: '已经到底了',
+        image: '/static/images/icons/error.png'
+      })
+      return
+    }
+    // 将page更新到data中
+    this.page = page
+    // 获取现有的内容
+    let tempArray = this.msgList
+
+    // 填充数据
+    tempList.forEach(ele => {
+      tempArray.push(ele)
+    })
+
+    this.msgList = tempArray
+    this.$apply()
+    wx.hideLoading()
+  }
+
+  async onShow() {
+    // 请求留言信息
+    let msgList = await postRequire.GetMessageList(String(this.id), 1)
+    let tempList = msgList.list
+    this.msgList = tempList
+    this.$apply()
+  }
+  onShareAppMessage = onShareAppMessage;
+}
+</script>
+
+<style lang="scss">
+@import "../zanui/btn.scss";
+page {
+  background-color: #ededed;
+}
+
+.mid .yyx {
+  width: 130rpx;
+}
+.dia {
+  color: #dd0a18;
+}
+.list {
+  margin-top: 30rpx;
+  background-color: #ededed;
+  .icon {
+    font-size: 20rpx;
+    line-height: 20rpx;
+    padding: 0rpx;
+    min-width: 0rpx;
+    width: auto;
+    color: #747474;
+    &.active {
+      color: #dd0a18;
+    }
+  }
+  .icon-jiagebaohu {
+    color: #240507;
+  }
+}
+.noMsg {
+  text-align: center;
+  margin-top: 100rpx;
+  font-size: 30rpx;
+}
+.fbBtn {
+  margin-top: 30rpx;
+  text-align: center;
+}
+.zan-btn {
+  display: inline-block;
+  width: 230rpx;
+}
+.item {
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+  padding-bottom: 10rpx;
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+.btnWapper {
+  padding-top: 10rpx;
+  padding-bottom: 10rpx;
+  display: flex;
+  font-size: 20rpx;
+  border-top: 1px solid #e5e5e5;
+  position: fixed;
+  width: 100%;
+  background-color: #fff;
+  bottom: 0;
+  left: 0;
+  .btnItem {
+    flex: 1;
+    color: #747474;
+    text-align: center;
+    text {
+      font-size: 20rpx;
+    }
+    button::after {
+      border: none;
+    }
+    button {
+      display: inline;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 20rpx;
+      text-align: center;
+      text-decoration: none;
+      line-height: 2.55555556;
+      border-radius: 0px;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+      color: #747474;
+      background-color: #ffffff;
+    }
+  }
+}
+.up {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 30rpx;
+  display: flex;
+  padding-top: 30rpx;
+}
+.imgWapper {
+  margin-top: 22rpx;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  image {
+    width: 100%;
+    margin-bottom: 15rpx;
+  }
+}
+.productInfo {
+  flex: 1;
+}
+.proName {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.detail {
+  text {
+    font-size: 23rpx;
+    margin-top: 10rpx;
+  }
+}
+.more {
+  text {
+    font-size: 18rpx;
+    color: #747474;
+  }
+  text-align: right;
+  margin-top: 10rpx;
+}
+.dowm {
+  display: flex; // width: 100%;
+  margin: 30rpx 20rpx;
+}
+.userInfo {
+  flex: 1;
+  margin-left: 20rpx;
+  padding: 25rpx;
+  color: #949494;
+  background-color: #f3f3f3;
+  border-radius: 10rpx;
+  view {
+    font-size: 20rpx;
+    color: #949494;
+  }
+  .pd {
+    padding-right: 25rpx;
+  }
+  label {
+    vertical-align: baseline;
+  }
+  .name {
+    font-size: 30rpx;
+    color: #444444;
+  }
+}
+.avatar {
+  display: inline-block;
+  position: relative;
+  width: 127rpx;
+  height: 127rpx;
+}
+.avatar__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.avatar__mold--circle {
+  border-radius: 50%;
+}
+.avatar__badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  z-index: 1;
+}
+.fr {
+  float: right;
+  height: 40rpx;
+  line-height: 40rpx;
+}
+
+.message {
+  margin-top: 10px;
+  padding: 30rpx 30rpx 40px 30rpx;
+  background-color: #fff;
+}
+
+.message-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border-top: 1px solid  #e5e5e5;
+  padding: 10rpx 0;
+  word-break: break-all;
+  view {
+    flex: 1;
+  }
+
+  .messageCtn {
+    flex: 5;
+
+  }
+}
+
+.ctn-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  line-height: 2.3;
+  .left {
+    line-height: 30rpx;
+    flex: 2.5;
+    
+    .time {
+      font-size: 20rpx;
+      color: grey;
+    }
+  }
+
+  .right {
+    flex: 1;
+    font-size: 20rpx;
+    color: white;
+
+    text {
+      display: inline-block;
+      background-color: #666;
+      padding: 10rpx 20rpx;
+      border-radius: 10rpx;
+      height: 30rpx;
+      line-height: 30rpx;
+    }
+  }
+}
+</style>

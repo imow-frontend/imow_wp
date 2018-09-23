@@ -48,7 +48,7 @@
           </text>
           <view class="imageCtn" style="text-align: center;">
             <repeat for="{{item.images}}" key="index" index="index" item="image">
-              <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" lazy-load="true" style="width:600rpx;"/>
+              <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" lazy-load="true" style="width:600rpx;" />
             </repeat>
           </view>
           <view class="btnWapper">
@@ -71,6 +71,10 @@
             </view>
             <view class="btnItem">
               <button open-type="share" data-did="{{item.id}}" data-title="{{item.title}}" data-image="{{item.images[0]}}">分享</button>
+              <FIcon type="fenge fr" />
+            </view>
+            <view @tap="addMsg" data-id="{{item.id}}" class="btnItem">
+              <text>留言</text>
             </view>
           </view>
         </view>
@@ -108,6 +112,27 @@
             <view @tap="addPrice">确认出价</view>
           </view>
         </view>
+      </view>
+      <view wx:if="{{msgList.length}}" class="message">
+        <view>留言板</view>
+        <repeat for="{{msgList}}" key="index" index="index" item="ctn">
+          <view class="message-item">
+            <view>{{index}}</view>
+            <view class="messageCtn">
+              <view class="ctn-item">
+                <view class="left">
+                  <view>{{ctn.name}}</view>
+                  <view class="time">{{ctn.createTime}}</view>
+                </view>
+                <view class="right">
+                  <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
+                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                </view>
+              </view>
+              <view>{{ctn.text}}</view>
+            </view>
+          </view>
+        </repeat>
       </view>
     </view>
   </view>
@@ -173,7 +198,9 @@ export default class Detail extends wepy.page {
     },
     star: '', // 活动开始时间
     end: '', // 活动结束时间
-    current: '' // 当前时间
+    current: '', // 当前时间
+    msgList: [], // 初始化的留言列表
+    page: 1
   };
   watch = {
     currentTime: function(val, oldval) {
@@ -182,6 +209,46 @@ export default class Detail extends wepy.page {
   };
   mixins = [router];
   methods = {
+    // 删除留言
+    async  deleteMsg(e) {
+      let id = e.currentTarget.dataset.id
+      let res = await postRequire.DeleteMessage(id)
+      if (res.status === 0) {
+        wx.showToast({
+          title: '删除成功！',
+          icon: 'success'
+        })
+        // 删除成功以后将此条内容从列表中删除
+        let tempArray = this.msgList
+        tempArray.forEach((element, index) => {
+          if (element.id === id) {
+            tempArray.splice(index, 1)
+          }
+        })
+        this.msgList = tempArray
+        this.$apply()
+      } else {
+        wx.showToast({
+          title: '删除失败！',
+          image: '/static/images/icon/error.png'
+        })
+      }
+    },
+
+    // 跳转到添加留言页面
+    async addMsg(e) {
+      if (!this.user.infoName || !this.user.infoMobile) {
+        await Tips.confirm('您没有添加个人联系方式。', {}, '去添加')
+        this.routeEditDetail()
+        return
+      }
+      let id = e.currentTarget.dataset.id
+
+      wx.navigateTo({
+        url: '/pages/edit?id=' + id
+      })
+    },
+
     bh(e) {
       const tel = e.currentTarget.dataset.tel
       wx.makePhoneCall({
@@ -241,7 +308,8 @@ export default class Detail extends wepy.page {
         let result = await postRequire.GetBid({ demandId: this.id })
         this.autions = result.data
         if (this.autions.length > 0) {
-          let setPrice = !this.isShow || this.autions[0].price > this.currentPrice
+          let setPrice =
+            !this.isShow || this.autions[0].price > this.currentPrice
           if (setPrice) {
             this.initPrice = this.autions[0].price
             this.currentPrice = this.initPrice + this.step
@@ -325,8 +393,8 @@ export default class Detail extends wepy.page {
           timeDistance -= msTime.hour * 3600000
           msTime.minutes = Math.floor(timeDistance / 60000)
           timeDistance -= msTime.minutes * 60000
-        // 是否开启秒表倒计,未完成
-        //                    this.secondsFixed ? msTime.seconds = new Number(timeDistance / 1000).toFixed(2) : msTime.seconds = Math.floor( timeDistance / 1000 ).toFixed(0);
+          // 是否开启秒表倒计,未完成
+          //                    this.secondsFixed ? msTime.seconds = new Number(timeDistance / 1000).toFixed(2) : msTime.seconds = Math.floor( timeDistance / 1000 ).toFixed(0);
           msTime.seconds = Math.floor(timeDistance / 1000).toFixed(0)
           timeDistance -= msTime.seconds * 1000
           if (msTime.hour < 10) {
@@ -344,19 +412,19 @@ export default class Detail extends wepy.page {
           setTimeout(() => {
             if (type) {
               this.methods.runTime.call(
-              this,
-              this.end,
-              (endTime += 1000),
-              callFun,
-              true
-            )
+                this,
+                this.end,
+                (endTime += 1000),
+                callFun,
+                true
+              )
             } else {
               this.methods.runTime.call(
-              this,
-              this.star,
-              (endTime += 1000),
-              callFun
-            )
+                this,
+                this.star,
+                (endTime += 1000),
+                callFun
+              )
             }
           }, 1000 - diffPerFunc)
           this.$apply()
@@ -390,14 +458,57 @@ export default class Detail extends wepy.page {
       this.isEnd = true
     }
   };
+
+  // 上拉加载
+  async onReachBottom() {
+    wx.showLoading({
+      title: '拼命加载中'
+    })
+    // 设置page
+    let page = this.page + 1
+    let res = await postRequire.GetMessageList(String(this.id), page)
+    // 保存有效数据
+    let tempList = res.list
+    if (tempList.length === 0) {
+      wx.showToast({
+        title: '已经到底了',
+        image: '/static/images/icons/error.png'
+      })
+      return
+    }
+    // 将page更新到data中
+    this.page = page
+    // 获取现有的内容
+    let tempArray = this.msgList
+
+    // 填充数据
+    tempList.forEach(ele => {
+      tempArray.push(ele)
+    })
+
+    this.msgList = tempArray
+    this.$apply()
+    wx.hideLoading()
+  }
+
   async onReady() {
     this.methods.getAuctionBid.apply(this)
+  }
+
+  // 每一次打开页面都会请求
+  async onShow() {
+    // 请求留言信息
+    let msgList = await postRequire.GetMessageList(String(this.id), 1)
+    let tempList = msgList.list
+    this.msgList = tempList
+    this.$apply()
   }
 
   async onLoad(params) {
     this.unLoad = false
     this.id = params.id
     Tips.loading('努力加载中')
+
     await store.init()
 
     let result = await postRequire.AuctionDetail({
@@ -420,7 +531,6 @@ export default class Detail extends wepy.page {
   onUnload() {
     this.unLoad = true
   }
-
 }
 </script>
 
@@ -560,6 +670,7 @@ export default class Detail extends wepy.page {
 }
 
 .btnWapper {
+  background-color: #fff;
   display: flex;
   border-top: 1px solid #e5e5e5;
   .btnItem {
@@ -713,5 +824,60 @@ export default class Detail extends wepy.page {
   line-height: 40px;
   text-align: center;
   background-color: #dd0b1a;
+}
+
+.message {
+  margin-top: 10px;
+  padding: 30rpx;
+  background-color: #fff;
+}
+
+.message-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border-top: 1px solid  #e5e5e5;
+  padding: 10rpx 0;
+  word-break: break-all;
+  view {
+    flex: 1;
+  }
+
+  .messageCtn {
+    flex: 5;
+  }
+}
+
+.ctn-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  line-height: 2.3;
+  .left {
+    line-height: 30rpx;
+    flex: 2.5;
+    
+    .time {
+      font-size: 20rpx;
+      color: grey;
+    }
+  }
+
+  .right {
+    flex: 1;
+    font-size: 20rpx;
+    color: white;
+
+    text {
+      display: inline-block;
+      background-color: #666;
+      padding: 10rpx 20rpx;
+      border-radius: 10rpx;
+      height: 30rpx;
+      line-height: 30rpx;
+    }
+  }
 }
 </style>
