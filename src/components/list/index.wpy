@@ -4,7 +4,7 @@
     <block wx:if="{{page.list.length>0}}">
       <view class="list">
         <repeat for="{{page.list}}" key="index" index="index" item="item">
-          <view class="item">
+          <view @tap="goToDetail" data-id="{{item.id}}" class="item">
             <view class="up">
               <view class="avatar">
                 <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl?t=1); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
@@ -27,7 +27,7 @@
                       <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
                     </block>
                     <block wx:else>
-                      <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                      <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap.stop="yyx" data-did="{{item.id}}">有意向</button>
                     </block>
                   </block>
                 </view>
@@ -137,6 +137,15 @@ export default class List extends wepy.component {
     return result
   }
   methods = {
+    // 跳转到详情页面
+    goToDetail(e) {
+      console.log(e)
+      let id = e.currentTarget.dataset.id
+      wx.navigateTo({
+        url: '/pages/messageDetail?id=' + id
+      })
+    },
+
     qjp: function(e) {
       const id = e.currentTarget.dataset.did
       wx.navigateTo({ url: `/pages/detail?id=${id}` })

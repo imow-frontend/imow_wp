@@ -24,14 +24,16 @@ export default class extends wepy.app {
       'pages/normalPost',
       'pages/detail',
       // 'pages/normalPost',
-      
       'pages/publicList',
       'pages/editDetail',
       'pages/member',
       'pages/login',
       'pages/post',
       'pages/followList',
-      'pages/postDetail'
+      'pages/postDetail',
+      'pages/edit',
+      'pages/messageDetail'
+
     ],
     window: {
       'backgroundTextStyle': 'light',

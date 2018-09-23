@@ -1,0 +1,89 @@
+<template>
+  <block>
+    <NavBar title="编辑留言" />
+    <view class="btn">
+      <text @tap="cancel">取消</text>
+      <text @tap="addMsg">发送</text>
+    </view>
+    <textarea bindinput="handleChange" value="{{text}}" placeholder="请输入你要留言的内容..." cols="30" rows="10"></textarea>
+  </block>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../mixins/base'
+import input from '../mixins/input'
+import NavBar from '../components/NavBar'
+import postRequire from '../api/postRequire'
+
+export default class PostNews extends wepy.page {
+  data = {
+    text: '',
+  };
+  components = {
+    NavBar
+  };
+  methods = {
+    async addMsg() {
+      let res = await postRequire.PublishMessag(this.id, this.text)
+      if (res.status === 0) {
+        wx.showToast({
+          title: '留言成功！',
+          icon: 'success'
+        })
+
+        setTimeout(() => {
+          wx.navigateBack({
+            delta: 1
+          })
+        }, 1200)
+      } else {
+        wx.showToast({
+          title: '留言失败！',
+          image: '/static/images/icon/error.png'
+        })
+      }
+    },
+
+    // 更新textarea的值
+    handleChange(e) {
+      this.text = e.detail.value
+      this.$apply()
+    },
+
+    // 取消留言
+    cancel() {
+      wx.navigateBack({
+        delta: 1
+      })
+    }
+  };
+  mixins = [base, input];
+  async onLoad(params) {
+    // 获取id
+    this.id = params.id
+    // 设置id
+    this.$apply()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.btn {
+ 
+  display: flex;
+  flex-direction: row;
+  padding: 20rpx 20rpx;
+  justify-content: space-between;
+  align-items: center;
+
+  text {
+     font-size: 36rpx;
+  }
+}
+
+textarea {
+  font-size: 30rpx;
+  padding: 20rpx;
+}
+</style>
