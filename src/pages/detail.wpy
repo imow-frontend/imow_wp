@@ -126,7 +126,7 @@
                 </view>
                 <view class="right">
                   <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
-                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}"  @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                  <text wx:if="{{!ctn.isSelf && isCreater}}"  @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
                 </view>
               </view>
               <view>{{ctn.text}}</view>
@@ -200,7 +200,8 @@ export default class Detail extends wepy.page {
     end: '', // 活动结束时间
     current: '', // 当前时间
     msgList: [], // 初始化的留言列表
-    page: 1
+    page: 1,
+    isCreater: ''
   };
   watch = {
     currentTime: function(val, oldval) {
@@ -215,6 +216,12 @@ export default class Detail extends wepy.page {
       wx.makePhoneCall({
         phoneNumber: phone
       })
+    },
+
+    // 去竞拍
+    qjp: function(e) {
+      const id = e.currentTarget.dataset.did
+      wx.navigateTo({ url: `/pages/detail?id=${id}` })
     },
 
     // 删除留言
@@ -477,6 +484,7 @@ export default class Detail extends wepy.page {
     let res = await postRequire.GetMessageList(String(this.id), page)
     // 保存有效数据
     let tempList = res.list
+    this.isCreater = res.isCreater
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -509,6 +517,7 @@ export default class Detail extends wepy.page {
     let msgList = await postRequire.GetMessageList(String(this.id), 1)
     let tempList = msgList.list
     this.msgList = tempList
+    this.isCreater = msgList.isCreater
     this.$apply()
   }
 

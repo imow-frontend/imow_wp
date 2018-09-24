@@ -105,25 +105,25 @@ export default class postRequire extends base {
   }
 
   // 新增一条留言
-  static async PublishMessag(demandId, text) {
-    // const url = `${this.baseUrl}/Demand/PublishMessag`
-    const url = `http://10.10.10.251:8067` + `/Demand/PublishMessage`
+  static async PublishMessage(demandId, text) {
+    const url = `${this.baseUrl}/Demand/PublishMessage`
+    // const url = `http://10.10.10.251:8067` + `/Demand/PublishMessage`
     const result = await this.post(url, {demandId, text})
     return result
   }
 
   // 获取留言列表
   static async GetMessageList(demandId, page) {
-    // const url = `${this.baseUrl}/Demand/PublishMessag`
-    const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
+    const url = `${this.baseUrl}/Demand/GetMessageList`
+    // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
     const result = await this.get(url, {demandId, page})
     return result
   }
 
   // 删除留言
   static async DeleteMessage(messageId) {
-    // const url = `${this.baseUrl}/Demand/PublishMessag`
-    const url = `http://10.10.10.251:8067` + `/Demand/DeleteMessage`
+    const url = `${this.baseUrl}/Demand/DeleteMessage`
+    // const url = `http://10.10.10.251:8067` + `/Demand/DeleteMessage`
     const result = await this.post(url, {messageId})
     return result
   }
