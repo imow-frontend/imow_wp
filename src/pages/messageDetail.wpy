@@ -91,7 +91,7 @@
                 </view>
                 <view class="right">
                   <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
-                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                  <text wx:if="{{!ctn.isSelf && isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
                 </view>
               </view>
               <view>{{ctn.text}}</view>
@@ -133,7 +133,8 @@ export default class Index extends wepy.page {
   data = {
     item: {},
     msgList: [],
-    page: 1
+    page: 1,
+    isCreater: ''
   };
   mixins = [router];
   methods = {
@@ -143,6 +144,35 @@ export default class Index extends wepy.page {
       wx.makePhoneCall({
         phoneNumber: phone
       })
+    },
+
+    // 去竞拍
+    qjp: function(e) {
+      const id = e.currentTarget.dataset.did
+      wx.navigateTo({ url: `/pages/detail?id=${id}` })
+    },
+
+    // 有意向
+    yyx: async function(e) {
+      try {
+        await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
+        if (!this.user.infoName || !this.user.infoMobile) {
+          this.routeEditDetail()
+          return
+        }
+        if (!this.yyxLoading) {
+          this.yyxLoading = true
+          const id = e.currentTarget.dataset.did
+          const data = await postRequire.addInterested(id)
+          if (data.status === 0) {
+            Tips.success('已成功', 1000)
+          }
+          this.yyxLoading = false
+          this.$apply()
+        }
+      } catch (error) {
+        return false
+      }
     },
 
     // 跳转到添加留言页面
@@ -204,6 +234,7 @@ export default class Index extends wepy.page {
     let res = await postRequire.GetMessageList(String(this.id), page)
     // 保存有效数据
     let tempList = res.list
+    this.isCreater = res.isCreater
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -230,7 +261,9 @@ export default class Index extends wepy.page {
     // 请求留言信息
     let msgList = await postRequire.GetMessageList(String(this.id), 1)
     let tempList = msgList.list
+    console.log(tempList)
     this.msgList = tempList
+    this.isCreater = msgList.isCreater
     this.$apply()
   }
   onShareAppMessage = onShareAppMessage;

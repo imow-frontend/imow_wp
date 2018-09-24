@@ -25,7 +25,7 @@ export default class PostNews extends wepy.page {
   };
   methods = {
     async addMsg() {
-      let res = await postRequire.PublishMessag(this.id, this.text)
+      let res = await postRequire.PublishMessage(this.id, this.text)
       if (res.status === 0) {
         wx.showToast({
           title: '留言成功！',
