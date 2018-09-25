@@ -201,7 +201,7 @@ export default class Detail extends wepy.page {
     current: '', // 当前时间
     msgList: [], // 初始化的留言列表
     page: 1,
-    isCreater: ''
+    isCreater: false
   };
   watch = {
     currentTime: function(val, oldval) {
