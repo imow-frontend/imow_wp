@@ -79,26 +79,26 @@
       </view>
     </view>
     <view wx:if="{{msgList.length}}" class="message">
-        <view>留言板</view>
-        <repeat for="{{msgList}}" key="index" index="index" item="ctn">
-          <view class="message-item">
-            <view>{{index}}</view>
-            <view class="messageCtn">
-              <view class="ctn-item">
-                <view class="left">
-                  <view>{{ctn.name}}</view>
-                  <view class="time">{{ctn.createTime}}</view>
-                </view>
-                <view class="right">
-                  <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
-                  <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
-                </view>
+      <view>留言板</view>
+      <repeat for="{{msgList}}" key="index" index="index" item="ctn">
+        <view class="message-item">
+          <view>{{index}}</view>
+          <view class="messageCtn">
+            <view class="ctn-item">
+              <view class="left">
+                <view>{{ctn.name}}</view>
+                <view class="time">{{ctn.createTime}}</view>
               </view>
-              <view>{{ctn.text}}</view>
+              <view class="right">
+                <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
+                <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+              </view>
             </view>
+            <view>{{ctn.text}}</view>
           </view>
-        </repeat>
-      </view>
+        </view>
+      </repeat>
+    </view>
   </view>
 </template>
 
@@ -118,7 +118,6 @@ import onShareAppMessage from '../utils/Share'
 @connect({
   user: store.get('user')
 })
-
 export default class Index extends wepy.page {
   components = {
     NavBar,
@@ -145,6 +144,11 @@ export default class Index extends wepy.page {
       })
     },
 
+    qjp: function(e) {
+      const id = e.currentTarget.dataset.did
+      wx.navigateTo({ url: `/pages/detail?id=${id}` })
+    },
+
     // 跳转到添加留言页面
     async addMsg(e) {
       if (!this.user.infoName || !this.user.infoMobile) {
@@ -157,9 +161,23 @@ export default class Index extends wepy.page {
         url: '/pages/edit?id=' + id
       })
     },
+    HandelFollow: async function(e) {
+      const id = e.currentTarget.dataset.did
+      const data = this.item.isFollow
+        ? await postRequire.removeFollow(id)
+        : await postRequire.addFollow(id)
+      if (data.status === 0) {
+        this.item.isFollow = !this.item.isFollow
+        this.$apply()
+      }
+
+      wx.showShareMenu({
+        withShareTicket: true
+      })
+    },
 
     // 删除留言
-    async  deleteMsg(e) {
+    async deleteMsg(e) {
       let id = e.currentTarget.dataset.id
       let res = await postRequire.DeleteMessage(id)
       if (res.status === 0) {
@@ -182,13 +200,13 @@ export default class Index extends wepy.page {
           image: '/static/images/icon/error.png'
         })
       }
-    },
+    }
   };
 
   async onLoad(params) {
     Tips.loading('努力加载中')
     this.id = params.id
-    let res = await postRequire.AuctionDetail({id: params.id})
+    let res = await postRequire.AuctionDetail({ id: params.id })
     this.item = res[0]
     this.$apply()
     Tips.loaded()
@@ -249,9 +267,7 @@ page {
 .dia {
   color: #dd0a18;
 }
-.list {
-  margin-top: 30rpx;
-  background-color: #ededed;
+.btnItem {
   .icon {
     font-size: 20rpx;
     line-height: 20rpx;
@@ -428,7 +444,7 @@ page {
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
-  border-top: 1px solid  #e5e5e5;
+  border-top: 1px solid #e5e5e5;
   padding: 10rpx 0;
   word-break: break-all;
   view {
@@ -437,7 +453,6 @@ page {
 
   .messageCtn {
     flex: 5;
-
   }
 }
 
@@ -450,7 +465,7 @@ page {
   .left {
     line-height: 30rpx;
     flex: 2.5;
-    
+
     .time {
       font-size: 20rpx;
       color: grey;

@@ -17,7 +17,7 @@
                   <DIcon type="dingwei" />
                   <label class="pd">{{item.area}}</label>
                   <block wx:if="{{item.isAuction}}">
-                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="qjp" data-did="{{item.id}}">去竞拍</button>
+                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap.stop="qjp" data-did="{{item.id}}">去竞拍</button>
                   </block>
                   <block wx:else>
                     <block wx:if="{{user.imowUser && user.dlr}}">
