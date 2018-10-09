@@ -105,7 +105,7 @@ export default class postRequire extends base {
   }
 
   // 新增一条留言
-  static async PublishMessag(demandId, text) {
+  static async PublishMessage(demandId, text) {
     // const url = `${this.baseUrl}/Demand/PublishMessag`
     const url = `${this.baseUrl}/Demand/PublishMessage`
     const result = await this.post(url, {demandId, text})

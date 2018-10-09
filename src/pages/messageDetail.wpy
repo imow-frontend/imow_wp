@@ -79,21 +79,21 @@
       </view>
     </view>
     <view wx:if="{{msgList.length}}" class="message">
-      <view>留言板</view>
-      <repeat for="{{msgList}}" key="index" index="index" item="ctn">
-        <view class="message-item">
-          <view>{{index}}</view>
-          <view class="messageCtn">
-            <view class="ctn-item">
-              <view class="left">
-                <view>{{ctn.name}}</view>
-                <view class="time">{{ctn.createTime}}</view>
+        <view>留言板</view>
+        <repeat for="{{msgList}}" key="index" index="index" item="ctn">
+          <view class="message-item">
+            <view>{{index}}</view>
+            <view class="messageCtn">
+              <view class="ctn-item">
+                <view class="left">
+                  <view>{{ctn.name}}</view>
+                  <view class="time">{{ctn.createTime}}</view>
+                </view>
+                <view class="right">
+                  <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
+                  <text wx:if="{{!ctn.isSelf && isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
+                </view>
               </view>
-              <view class="right">
-                <text wx:if="{{ctn.isSelf}}" @tap="deleteMsg" data-id="{{ctn.id}}">删除留言</text>
-                <text wx:if="{{!ctn.isSelf && ctn.isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
-              </view>
-            </view>
             <view>{{ctn.text}}</view>
           </view>
         </view>
@@ -132,7 +132,8 @@ export default class Index extends wepy.page {
   data = {
     item: {},
     msgList: [],
-    page: 1
+    page: 1,
+    isCreater: false
   };
   mixins = [router];
   methods = {
@@ -141,6 +142,12 @@ export default class Index extends wepy.page {
       let phone = e.currentTarget.dataset.phone
       wx.makePhoneCall({
         phoneNumber: phone
+      })
+    },
+    dia(e) {
+      const tel = e.currentTarget.dataset.tel
+      wx.makePhoneCall({
+        phoneNumber: `${tel}`
       })
     },
 
@@ -222,6 +229,7 @@ export default class Index extends wepy.page {
     let res = await postRequire.GetMessageList(String(this.id), page)
     // 保存有效数据
     let tempList = res.list
+    this.isCreater = res.isCreater
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -248,7 +256,9 @@ export default class Index extends wepy.page {
     // 请求留言信息
     let msgList = await postRequire.GetMessageList(String(this.id), 1)
     let tempList = msgList.list
+    console.log(tempList)
     this.msgList = tempList
+    this.isCreater = msgList.isCreater
     this.$apply()
   }
   onShareAppMessage = onShareAppMessage;
@@ -267,6 +277,24 @@ page {
 .dia {
   color: #dd0a18;
 }
+
+.up {
+  .icon {
+    font-size: 20rpx;
+    line-height: 20rpx;
+    padding: 0rpx;
+    min-width: 0rpx;
+    width: auto;
+    color: #747474;
+    &.active {
+      color: #dd0a18;
+    }
+  }
+  .icon-jiagebaohu {
+    color: #240507;
+  }
+}
+
 .btnItem {
   .icon {
     font-size: 20rpx;
@@ -473,7 +501,7 @@ page {
   }
 
   .right {
-    flex: 1;
+    flex: 1.2;
     font-size: 20rpx;
     color: white;
 
