@@ -642,7 +642,7 @@ export default class Detail extends wepy.page {
 }
 
 .ctn {
-  padding-bottom: 40px;
+  // padding-bottom: 40px;
   background-color: #ededed;
   .clock {
     text-align: center;

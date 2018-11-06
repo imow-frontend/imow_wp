@@ -48,7 +48,7 @@
       </view>
       <view class="imgWapper">
         <repeat for="{{item.images}}" key="index" index="index" item="image">
-          <image mode="widthFix" src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" @tap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
+          <image mode="widthFix" src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" catchtap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
         </repeat>
       </view>
       <view class="btnWapper">

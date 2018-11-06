@@ -19,30 +19,38 @@ import postRequire from '../api/postRequire'
 export default class PostNews extends wepy.page {
   data = {
     text: '',
+    flag: true
   };
   components = {
     NavBar
   };
   methods = {
     async addMsg() {
-      let res = await postRequire.PublishMessage(this.id, this.text)
-      if (res.status === 0) {
-        wx.showToast({
-          title: '留言成功！',
-          icon: 'success'
-        })
-
-        setTimeout(() => {
-          wx.navigateBack({
-            delta: 1
+      if (this.flag) {
+        this.flag = false
+        this.$apply()
+        let res = await postRequire.PublishMessage(this.id, this.text)
+        if (res.status === 0) {
+          wx.showToast({
+            title: '留言成功！',
+            icon: 'success'
           })
-        }, 1200)
-      } else {
-        wx.showToast({
-          title: '留言失败！',
-          image: '/static/images/icon/error.png'
-        })
+
+          setTimeout(() => {
+            wx.navigateBack({
+              delta: 1
+            })
+          }, 1200)
+        } else {
+          wx.showToast({
+            title: '留言失败！',
+            image: '/static/images/icon/error.png'
+          })
+          this.flag = true
+          this.$apply()
+        }
       }
+
     },
 
     // 更新textarea的值

@@ -4,7 +4,7 @@
     <block wx:if="{{page.list.length>0}}">
       <view class="list">
         <repeat for="{{page.list}}" key="index" index="index" item="item">
-          <view @tap="goToDetail" data-id="{{item.id}}" class="item">
+          <view @tap="goToDetail" data-id="{{item.id}}" data-isAuction="{{item.isAuction}}" class="item">
             <view class="up">
               <view class="avatar">
                 <view class="avatar__pic avatar__mold--circle avatar" style="background-image: url(http://pavr51yat.bkt.clouddn.com/avatarUrl?t=1); background-repeat: no-repeat; background-position: center center; background-size: cover"></view>
@@ -50,7 +50,7 @@
             </view>
             <view class="imgWapper">
               <repeat for="{{item.images}}" key="index" index="index" item="image">
-                <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" @tap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
+                <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" catchtap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
               </repeat>
             </view>
             <view class="btnWapper">
@@ -141,9 +141,19 @@ export default class List extends wepy.component {
     goToDetail(e) {
       console.log(e)
       let id = e.currentTarget.dataset.id
-      wx.navigateTo({
-        url: '/pages/messageDetail?id=' + id
-      })
+      let isAuction = e.currentTarget.dataset.isauction
+      if (isAuction) {
+        console.log('这里！')
+        wx.navigateTo({
+          url: '/pages/detail?id=' + id
+        })
+
+      } else {
+        console.log('哪里')
+        wx.navigateTo({
+          url: '/pages/messageDetail?id=' + id
+        })
+      }
     },
 
     qjp: function(e) {
