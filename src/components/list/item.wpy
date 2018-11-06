@@ -32,7 +32,7 @@
     </view>
     <view class="imgWapper">
       <repeat for="{{item.images}}" key="index" index="index" item="image">
-        <image src="{{image}}" lazy-load="true" @tap="previewImg" id="{{image}}" data-did="{{item.id}}"/>
+        <image src="{{image}}" lazy-load="true" catchtap="previewImg" id="{{image}}" data-did="{{item.id}}"/>
       </repeat>
     </view>
     <view class="btnWapper">
