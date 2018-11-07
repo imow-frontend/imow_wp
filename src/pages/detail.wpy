@@ -98,7 +98,7 @@
           </view>
         </block>
       </view>
-      <view class="givePrice" @tap="handleGivePrice" wx:if="{{!isEnd &&isStart && getAction && user.dlr}}">出个价</view>
+      <view class="givePrice" @tap="handleGivePrice" wx:if="{{!isEnd &&isStart && getAction}}">出个价</view>
       <view catchtouchmove='true' class="popupPane" @tap="handleGivePrice" wx:if="{{isShow}}">
         <view class="mask"></view>
         <view class="popupPaneCtn">
