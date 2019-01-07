@@ -139,6 +139,9 @@ export default class postRequire extends base {
           name: 'file',
           success: function(res) {
             resolve(JSON.parse(res.data).src)
+          },
+          fail(error) {
+            console.log(error)
           }
         })
       })

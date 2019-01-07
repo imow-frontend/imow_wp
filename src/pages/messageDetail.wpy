@@ -229,6 +229,7 @@ export default class Index extends wepy.page {
     let res = await postRequire.GetMessageList(String(this.id), page)
     // 保存有效数据
     let tempList = res.list
+    console.log(res.isCreater)
     this.isCreater = res.isCreater
     if (tempList.length === 0) {
       wx.showToast({
@@ -256,7 +257,7 @@ export default class Index extends wepy.page {
     // 请求留言信息
     let msgList = await postRequire.GetMessageList(String(this.id), 1)
     let tempList = msgList.list
-    console.log(tempList)
+    console.log(msgList)
     this.msgList = tempList
     this.isCreater = msgList.isCreater
     this.$apply()
