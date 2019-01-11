@@ -19,6 +19,8 @@ setStore(store)
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/reply',
+      'pages/comment',
       // 'pages/authorization',
       'pages/index',
       'pages/normalPost',
@@ -33,7 +35,6 @@ export default class extends wepy.app {
       'pages/postDetail',
       'pages/edit',
       'pages/messageDetail'
-
     ],
     window: {
       'backgroundTextStyle': 'light',

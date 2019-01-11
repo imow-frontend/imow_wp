@@ -1,0 +1,95 @@
+<template>
+  <view>
+    <NavBar title="我的留言" />
+    <view class="wrapper">
+      <view class="replyer">
+        <view>
+          <view>回复人</view>
+          <view class="time">17-12-07 09:08</view>
+        </view>
+        <button class="zan-btn zan-btn--small">回复</button>
+      </view>
+      <view class="reply">回复<text class="name">@评论人</text>：余杭老余杭这边</view>
+      <view class="ctn">
+        <view><text>@评论人：</text>这里是评论人发布的消息</view>
+        <view class="post">
+          <image
+            mode="widthFix"
+            src="http://dummyimage.com/100x100/fb0a2a"
+          />
+          <view>
+            <view class="name">@我是发布人</view>
+            <view class="post-ctn">
+              这里是发布人发布的内容
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import router from '../mixins/router'
+import NavBar from '../components/NavBar'
+export default class Index extends wepy.page {
+  mixins = [router];
+  components = {
+    NavBar
+  };
+  data = {
+    canIUse: wx.canIUse('button.open-type.getUserInfo')
+  };
+
+  onLoad() {}
+
+  methods = {};
+}
+</script>
+
+<style lang="scss">
+@import "../zanui/btn.scss";
+.wrapper {
+  font-size: 30rpx;
+  line-height: 1.6;
+  .replyer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 30rpx;
+
+    .name {
+      font-size: 30rpx;
+    }
+
+    .time {
+      font-size: 24rpx;
+      color: #8a8a8a;
+    }
+  }
+
+  .reply {
+    padding: 0 30rpx;
+  }
+
+  .ctn {
+    padding: 10rpx 30rpx;
+    background-color: #f7f7f7;
+
+    .post {
+      display: flex;
+      flex-direction: row;
+      
+      image {
+        width: 160rpx;
+        margin-right: 10rpx;
+      }
+    }
+  }
+}
+
+.name {
+  color: #556cb0;
+}
+</style>
