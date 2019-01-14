@@ -119,20 +119,33 @@ export default class postRequire extends base {
   }
 
   // 新增一条留言
-  static async PublishMessage(demandId, text) {
+  static async PublishMessage(postId, commentId, text) {
     const url = `${this.baseUrl}/Demand/PublishMessage`
     // const url = `http://10.10.10.251:8067` + `/Demand/PublishMessage`
     const result = await this.post(url, {
-      demandId,
+      postId,
+      commentId,
       text
     })
     return result
   }
 
-  // 获取留言列表
+  // 旧获取留言列表
   static async GetMessageList(demandId, page) {
     const url = `${this.baseUrl}/Demand/GetMessageList`
     // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
+    const result = await this.get(url, {
+      demandId,
+      page
+    })
+    return result
+  }
+
+  // 获取留言列表新的
+  static async GetMessageReplyList(demandId, page) {
+    // const url = `${this.baseUrl}/Demand/GetMessageReplyList`
+    // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
+    const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/GetMessageReplyList`
     const result = await this.get(url, {
       demandId,
       page
@@ -151,9 +164,19 @@ export default class postRequire extends base {
   }
 
   // 获取回复的列表
-  static async getCommentList(messageId) {
+  static async getCommentList(demandId) {
     // const url = `${this.baseUrl}/Demand/GetReplyDetail`
     const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/GetReplyDetail`
+    const result = await this.get(url, {
+      demandId
+    })
+    return result
+  }
+
+  // 获取全部评论
+  static async relateToMe(messageId) {
+    // const url = `${this.baseUrl}/Demand/GetReplyDetail`
+    const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/RelateToMe`
     const result = await this.get(url, {
       messageId
     })

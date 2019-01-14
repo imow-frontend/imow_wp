@@ -1,25 +1,25 @@
 <template>
   <view class="container">
-    <NavBar title="{{listData.replyList.length + '条回复'}}" />
+    <NavBar title="全部回复" />
     <view class="comment-wrapper">
       <view class="comment">
         <view>
-          <view>{{listData.nickName}}</view>
+          <view>{{listData.commenter}}</view>
           <view class="time">{{listData.createTime}}</view>
         </view>
         <button class="zan-btn zan-btn--small">回复</button>
       </view>
       <view class="ctn">{{listData.text}}</view>
-      <text style="color: #556cb0;">查看原发布内容</text>
+      <text style="color: #556cb0;" @tap="back">查看原发布内容</text>
     </view>
     <view class="msg-wrapper">
       <repeat for="{{listData.replyList}}" key="index" index="index" item="comment">
         <view class="item">
           <view>
-            <view>{{comment.nickName}}</view>
+            <view>{{comment.replyer}}</view>
             <view class="time">{{comment.createTime}}</view>
           </view>
-          <view><text class="name">@{{comment.childName}} </text> {{comment.text}}</view>
+          <view><text class="name">@{{comment.commenter}} </text> {{comment.text}}</view>
         </view>
       </repeat>
     </view>
@@ -41,13 +41,20 @@ export default class Index extends wepy.page {
     listData: ''
   };
 
-  async onLoad() {
-    let res = await postRequire.getCommentList()
+  async onLoad(params) {
+    console.log(params)
+    let res = await postRequire.getCommentList(params.commentId)
     this.listData = res
     this.$apply()
   }
 
-  methods = {};
+  methods = {
+    back() {
+      wx.navigateBack({
+        delta: 1
+      })
+    }
+  };
 }
 </script>
 

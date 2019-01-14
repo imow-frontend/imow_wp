@@ -113,7 +113,8 @@
           </view>
         </view>
       </view>
-      <view wx:if="{{msgList.length}}" class="message">
+      <!-- 老留言 -->
+      <!-- <view wx:if="{{msgList.length}}" class="message">
         <view>留言板</view>
         <repeat for="{{msgList}}" key="index" index="index" item="ctn">
           <view class="message-item">
@@ -133,7 +134,24 @@
             </view>
           </view>
         </repeat>
+      </view> -->
+      <!-- 新留言 -->
+      <view>
+        <repeat for="{{commentList}}" key="index" index="index" item="item2">
+          <view class="comment">
+            <view>{{item2.commenter}}</view>
+            <view class="text">{{item2.text}}</view>
+            <view class="replyList">
+              <repeat for="{{item2.replyList}}" key="index" index="index" item="child">
+                <view><text class="name">{{child.replyer}}</text>：{{child.text}}</view>
+              </repeat>
+              <view @tap="readAllComment" data-commentid="{{item2.commentId}}">共{{item2.replyList.length}}条评论></view>
+            </view>
+            <view class="last"><view>第{{index + 1}}楼 <text>{{item.createTime}}</text></view> <text @tap="addMsg" data-commentid="{{item2.commentId}}" data-id="{{item.id}}">回复</text></view>
+          </view>
+        </repeat>
       </view>
+      <view style="padding-top: 60rpx;"></view>
     </view>
   </view>
 </template>
@@ -199,7 +217,7 @@ export default class Detail extends wepy.page {
     star: '', // 活动开始时间
     end: '', // 活动结束时间
     current: '', // 当前时间
-    msgList: [], // 初始化的留言列表
+    commentList: [], // 初始化的留言列表
     page: 1,
     isCreater: false
   };
@@ -258,9 +276,17 @@ export default class Detail extends wepy.page {
         return
       }
       let id = e.currentTarget.dataset.id
+      let commentId = e.currentTarget.dataset.commentid
 
       wx.navigateTo({
-        url: '/pages/edit?id=' + id
+        url: '/pages/edit?postId=' + id + '&commentId=' + commentId
+      })
+    },
+
+    readAllComment(e) {
+      let commentId = e.currentTarget.dataset.commentid
+      wx.navigateTo({
+        url: '/pages/reply?commentId=' + commentId
       })
     },
 
@@ -514,10 +540,8 @@ export default class Detail extends wepy.page {
   // 每一次打开页面都会请求
   async onShow() {
     // 请求留言信息
-    let msgList = await postRequire.GetMessageList(String(this.id), 1)
-    let tempList = msgList.list
-    this.msgList = tempList
-    this.isCreater = msgList.isCreater
+    let res = await postRequire.GetMessageReplyList(String(this.id), 1)
+    this.commentList = res.commentList
     this.$apply()
   }
 
@@ -896,5 +920,46 @@ export default class Detail extends wepy.page {
       line-height: 30rpx;
     }
   }
+}
+
+.comment {
+  font-size: 30rpx;
+  padding: 6rpx 30rpx;
+  background-color: white;
+  color: #5a5a5a;
+  line-height: 1.6;
+
+  .text {
+    color: black;
+  }
+
+  .replyList {
+    background-color: #f7f7f7;
+    padding: 10rpx;
+
+    view:last-child {
+      color: #466d8e;
+      font-size: 26rpx;
+    }
+
+    .name {
+      color: #466d8e;
+    }
+  }
+
+  .last {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 2rpx solid #e7e7e7;
+    margin-top: 10rpx;
+    text {
+      font-size: 24rpx;
+    }
+  }
+}
+
+.comment:last-child .last {
+  border-bottom: none;
 }
 </style>

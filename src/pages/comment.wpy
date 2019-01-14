@@ -2,29 +2,34 @@
   <view>
     <NavBar title="我的留言" />
     <view class="wrapper">
-      <view class="replyer">
-        <view>
-          <view>回复人</view>
-          <view class="time">17-12-07 09:08</view>
-        </view>
-        <button class="zan-btn zan-btn--small">回复</button>
-      </view>
-      <view class="reply">回复<text class="name">@评论人</text>：余杭老余杭这边</view>
-      <view class="ctn">
-        <view><text>@评论人：</text>这里是评论人发布的消息</view>
-        <view class="post">
-          <image
-            mode="widthFix"
-            src="http://dummyimage.com/100x100/fb0a2a"
-          />
+      <repeat
+        for="{{replyList}}"
+        key="index"
+        index="index"
+        item="item"
+      >
+        <view class="replyer">
           <view>
-            <view class="name">@我是发布人</view>
-            <view class="post-ctn">
-              这里是发布人发布的内容
+            <view>{{item.replyer}}</view>
+            <view class="time">{{item.time}}</view>
+          </view>
+          <button data-postid="{{item.postId}}" data-commentid="{{item.commentId}}" data-did="{{item.id}}" @tap="replyPublish" class="zan-btn zan-btn--small">回复</button>
+        </view>
+        <view class="reply">回复<text class="name">@{{item.commenter}}</text>：{{item.text}}</view>
+        <view class="ctn">
+          <view><text>@{{item.commenter}}：</text>{{item.commentText}}</view>
+          <view class="post">
+            <image
+              mode="widthFix"
+              src="{{item.postImg}}"
+            />
+            <view>
+              <view class="name">@{{item.poster}}</view>
+              <view class="post-ctn">{{item.postText}}</view>
             </view>
           </view>
         </view>
-      </view>
+      </repeat>
     </view>
   </view>
 </template>
@@ -33,18 +38,35 @@
 import wepy from 'wepy'
 import router from '../mixins/router'
 import NavBar from '../components/NavBar'
+import postRequire from '../api/postRequire'
 export default class Index extends wepy.page {
   mixins = [router];
   components = {
     NavBar
   };
   data = {
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    replyList: ''
   };
 
-  onLoad() {}
+  async onLoad() {
+    let res = await postRequire.relateToMe()
+    this.replyList = res.replyList
+    this.$apply()
+    console.log(res)
+  }
 
-  methods = {};
+  methods = {
+    replyPublish(e) {
+      let id = e.currentTarget.dataset.did
+      let commentId = e.currentTarget.dataset.commentid
+      let postId = e.currentTarget.dataset.postid
+      commentId = commentId || id
+      wx.navigateTo({
+        url: '/pages/edit?postId=' + postId + '&commentId=' + commentId
+      })
+    }
+  };
 }
 </script>
 
@@ -76,11 +98,12 @@ export default class Index extends wepy.page {
   .ctn {
     padding: 10rpx 30rpx;
     background-color: #f7f7f7;
+    margin-bottom: 30rpx;
 
     .post {
       display: flex;
       flex-direction: row;
-      
+
       image {
         width: 160rpx;
         margin-right: 10rpx;

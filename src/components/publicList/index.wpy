@@ -63,7 +63,7 @@
     <block wx:if="{{page.list.length>0}}">
       <view class="list">
         <repeat for="{{page.list}}" key="index" index="index" item="item">
-          <view class="item">
+          <view class="item" @tap="goDetail" data-did="{{item.id}}" data-paimai="{{item.isAuction}}">
             <view class="main">
               <view>
                 <image src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+item.images[0]+'?x-oss-process=style/list_img'}}" lazy-load="true" class="img" />
@@ -122,6 +122,20 @@ export default class PL extends wepy.component {
     };
     mixins = [router];
     methods={
+      goDetail(e) {
+        let id = e.currentTarget.dataset.did
+        let isAuction = e.currentTarget.dataset.paimai
+        if (isAuction) {
+          wx.navigateTo({
+            url: '/pages/detail?id=' + id
+          })
+        } else {
+          wx.navigateTo({
+            url: '/pages/messageDetail?id=' + id
+          })
+        }
+      },
+
       async delItem(e) {
         try {
           await Tips.confirm('确认删除吗?')
