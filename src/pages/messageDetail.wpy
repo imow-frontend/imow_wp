@@ -25,7 +25,7 @@
                 <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
               </block>
               <block wx:else>
-                <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-phone="{{item.contactMobile}}">拨打电话</button>
               </block>
             </block>
           </view>
@@ -104,15 +104,16 @@
       <view>
         <repeat for="{{commentList}}" key="index" index="index" item="item2">
           <view class="comment">
-            <view>{{item2.commenter}}</view>
+            <view>{{item2.commenter}} <button class="zan-btn zan-btn--small" style="float:right; width: auto;" wx-if="{{isPoster}}" data-phone="{{item2.phone}}" @tap="ringUp">联系他</button></view>
             <view class="text">{{item2.text}}</view>
-            <view class="replyList">
+            <view wx-if="{{item2.replyList.length}}" class="replyList">
               <repeat for="{{item2.replyList}}" key="index" index="index" item="child">
                 <view><text class="name">{{child.replyer}}</text>：{{child.text}}</view>
               </repeat>
-              <view @tap="readAllComment" data-commentid="{{item2.commentId}}">共{{item2.replyList.length}}条评论></view>
+              <view @tap="readAllComment" data-commentid="{{item2.commentId}}">共{{item2.total}}条评论></view>
             </view>
-            <view class="last"><view>第{{index + 1}}楼 <text>{{item.createTime}}</text></view> <text @tap="addMsg" data-commentid="{{item2.commentId}}" data-id="{{item.id}}">回复</text></view>
+            <view class="last"><view>第{{index + 1}}楼 <text>{{item.createTime}}</text></view> 
+            <text wx:if="{{isPoster || item2.isCommenter}}" @tap="addMsg" data-commentid="{{item2.commentId}}" data-id="{{item.id}}">回复</text></view>
           </view>
         </repeat>
       </view>
@@ -152,10 +153,15 @@ export default class Index extends wepy.page {
     item: {},
     commentList: [],
     page: 1,
-    isCreater: false
+    isPoster: false
   };
   mixins = [router];
   methods = {
+    // 拨打电话联系发布人
+    bddh() {
+
+    },
+
     // 拨打电话
     ringUp(e) {
       let phone = e.currentTarget.dataset.phone
@@ -173,21 +179,15 @@ export default class Index extends wepy.page {
     // 有意向
     yyx: async function(e) {
       try {
-        await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
+        let phone = e.currentTarget.dataset.phone
+        // await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
         if (!this.user.infoName || !this.user.infoMobile) {
           this.routeEditDetail()
           return
         }
-        if (!this.yyxLoading) {
-          this.yyxLoading = true
-          const id = e.currentTarget.dataset.did
-          const data = await postRequire.addInterested(id)
-          if (data.status === 0) {
-            Tips.success('已成功', 1000)
-          }
-          this.yyxLoading = false
-          this.$apply()
-        }
+        wx.makePhoneCall({
+          phoneNumber: phone
+        })
       } catch (error) {
         return false
       }
@@ -213,7 +213,7 @@ export default class Index extends wepy.page {
     readAllComment(e) {
       let commentId = e.currentTarget.dataset.commentid
       wx.navigateTo({
-        url: '/pages/reply?commentId=' + commentId
+        url: '/pages/reply?commentId=' + commentId + '&postId=' + this.id
       })
     },
 
@@ -260,11 +260,11 @@ export default class Index extends wepy.page {
     })
     // 设置page
     let page = this.page + 1
-    let res = await postRequire.GetMessageList(String(this.id), page)
+    let res = await postRequire.GetMessageReplyList(String(this.id), page)
     // 保存有效数据
-    let tempList = res.list
+    let tempList = res.commentList
     console.log(res.isCreater)
-    this.isCreater = res.isCreater
+    this.isPoster = res.isPoster
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -275,23 +275,24 @@ export default class Index extends wepy.page {
     // 将page更新到data中
     this.page = page
     // 获取现有的内容
-    let tempArray = this.msgList
+    let tempArray = this.commentList
 
     // 填充数据
     tempList.forEach(ele => {
       tempArray.push(ele)
     })
 
-    this.msgList = tempArray
+    this.commentList = tempArray
     this.$apply()
     wx.hideLoading()
   }
 
   async onShow() {
     // 请求留言信息
-    let res = await postRequire.GetMessageReplyList()
+    let res = await postRequire.GetMessageReplyList(this.id, 1)
     console.log(res)
     this.commentList = res.commentList
+    this.isPoster = res.isPoster
     this.$apply()
   }
   onShareAppMessage = onShareAppMessage;
@@ -574,5 +575,11 @@ page {
 
 .comment:last-child .last {
   border-bottom: none;
+}
+
+.comment view:first-child::after {
+  content: "";
+  clear: both;
+  display: block;
 }
 </style>

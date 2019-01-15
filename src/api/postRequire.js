@@ -120,7 +120,7 @@ export default class postRequire extends base {
 
   // 新增一条留言
   static async PublishMessage(postId, commentId, text) {
-    const url = `${this.baseUrl}/Demand/PublishMessage`
+    const url = `http://10.10.10.73:8067/Demand/PublishMessage`
     // const url = `http://10.10.10.251:8067` + `/Demand/PublishMessage`
     const result = await this.post(url, {
       postId,
@@ -145,7 +145,7 @@ export default class postRequire extends base {
   static async GetMessageReplyList(demandId, page) {
     // const url = `${this.baseUrl}/Demand/GetMessageReplyList`
     // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
-    const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/GetMessageReplyList`
+    const url = `http://10.10.10.73:8067` + `/Demand/GetMessageReplyList`
     const result = await this.get(url, {
       demandId,
       page
@@ -164,21 +164,32 @@ export default class postRequire extends base {
   }
 
   // 获取回复的列表
-  static async getCommentList(demandId) {
+  static async getCommentList(messageId, page) {
     // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/GetReplyDetail`
+    const url = `http://10.10.10.73:8067` + `/Demand/GetReplyDetail`
     const result = await this.get(url, {
-      demandId
+      messageId,
+      page
     })
     return result
   }
 
   // 获取全部评论
-  static async relateToMe(messageId) {
+  static async relateToMe(page) {
     // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://mock.eolinker.com/3FyelRg5d3c637ba0bb45244f85ed68d2b8bd1f8c65c055?uri=` + `/Demand/RelateToMe`
+    const url = `http://10.10.10.73:8067` + `/Demand/RelateToMe`
     const result = await this.get(url, {
-      messageId
+      page
+    })
+    return result
+  }
+
+   // 获取验证码
+  static async getCode(phone) {
+    // const url = `${this.baseUrl}/Demand/GetReplyDetail`
+    const url = `http://10.10.10.73:8067` + `/getCode`
+    const result = await this.get(url, {
+      phone
     })
     return result
   }

@@ -7,7 +7,7 @@
           <view>{{listData.commenter}}</view>
           <view class="time">{{listData.createTime}}</view>
         </view>
-        <button class="zan-btn zan-btn--small">回复</button>
+        <button @tap="reply" class="zan-btn zan-btn--small">回复</button>
       </view>
       <view class="ctn">{{listData.text}}</view>
       <text style="color: #556cb0;" @tap="back">查看原发布内容</text>
@@ -42,16 +42,59 @@ export default class Index extends wepy.page {
   };
 
   async onLoad(params) {
-    console.log(params)
-    let res = await postRequire.getCommentList(params.commentId)
+    this.commentId = params.commentId
+    this.postId = params.postId
+    this.$apply()
+  }
+
+  async onShow() {
+    let res = await postRequire.getCommentList(this.commentId, 1)
     this.listData = res
     this.$apply()
+  }
+
+  async onReachBottom() {
+    wx.showLoading({
+      title: '拼命加载中'
+    })
+    // 设置page
+    let page = this.page + 1
+    let res = await postRequire.getCommentList(String(this.commentId), page)
+    // 保存有效数据
+    let tempList = res.replyList
+    console.log(res.isCreater)
+    if (tempList.length === 0) {
+      wx.showToast({
+        title: '已经到底了',
+        image: '/static/images/icons/error.png'
+      })
+      return
+    }
+    // 将page更新到data中
+    this.page = page
+    // 获取现有的内容
+    let tempArray = this.listData.replyList
+
+    // 填充数据
+    tempList.forEach(ele => {
+      tempArray.push(ele)
+    })
+
+    this.listData.replyList = tempArray
+    this.$apply()
+    wx.hideLoading()
   }
 
   methods = {
     back() {
       wx.navigateBack({
         delta: 1
+      })
+    },
+
+    reply() {
+      wx.navigateTo({
+        url: '/pages/edit?postId=' + this.postId + '&commentId=' + this.commentId
       })
     }
   };

@@ -71,7 +71,7 @@ export default class PostNews extends wepy.page {
     console.log(params)
     // 获取id
     this.postId = params.postId
-    this.commentId = params.commentId
+    this.commentId = params.commentId === 'undefined' ? null : params.commentId
     // 设置id
     this.$apply()
   }

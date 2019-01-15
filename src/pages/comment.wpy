@@ -16,14 +16,15 @@
           <button data-postid="{{item.postId}}" data-commentid="{{item.commentId}}" data-did="{{item.id}}" @tap="replyPublish" class="zan-btn zan-btn--small">回复</button>
         </view>
         <view class="reply">回复<text class="name">@{{item.commenter}}</text>：{{item.text}}</view>
-        <view class="ctn">
-          <view><text>@{{item.commenter}}：</text>{{item.commentText}}</view>
+        <view class="ctn" @tap="goToDetail" data-postId="{{item.postId}}" data-isAuction="{{item.isAuction}}">
+          <view wx-if="{{item.commenter}}"><text>@{{item.commenter}}：</text>{{item.commentText}}</view>
           <view class="post">
             <image
-              mode="widthFix"
-              src="{{item.postImg}}"
+              mode="aspectFill"
+              style="width: 160rpx;height: 160rpx; flex: none;"
+              src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+item.postImg}}"
             />
-            <view>
+            <view style="background-color: white; width: 100%; padding: 10rpx;">
               <view class="name">@{{item.poster}}</view>
               <view class="post-ctn">{{item.postText}}</view>
             </view>
@@ -46,17 +47,33 @@ export default class Index extends wepy.page {
   };
   data = {
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    replyList: ''
+    replyList: '',
+    page: 1
   };
 
-  async onLoad() {
-    let res = await postRequire.relateToMe()
+  async onShow() {
+    let res = await postRequire.relateToMe(1)
     this.replyList = res.replyList
     this.$apply()
-    console.log(res)
   }
 
   methods = {
+    goToDetail(e) {
+      console.log(e)
+      let postId = e.currentTarget.dataset.postid
+      let isAuction = e.currentTarget.dataset.isauction
+      if (isAuction) {
+        wx.navigateTo({
+          url: '/pages/messageDetail?id=' + postId
+        })
+      } else {
+        wx.navigateTo({
+          url: '/pages/detail?id=' + postId
+        })
+      }
+
+    },
+
     replyPublish(e) {
       let id = e.currentTarget.dataset.did
       let commentId = e.currentTarget.dataset.commentid
@@ -65,6 +82,40 @@ export default class Index extends wepy.page {
       wx.navigateTo({
         url: '/pages/edit?postId=' + postId + '&commentId=' + commentId
       })
+    },
+
+    // 上拉加载
+    async onReachBottom() {
+      wx.showLoading({
+        title: '拼命加载中'
+      })
+    // 设置page
+      let page = this.page + 1
+      let res = await postRequire.relateToMe(page)
+    // 保存有效数据
+      let tempList = res.replyList
+      // console.log(res.isCreater)
+      // this.isPoster = res.isPoster
+      if (tempList.length === 0) {
+        wx.showToast({
+          title: '已经到底了',
+          image: '/static/images/icons/error.png'
+        })
+        return
+      }
+    // 将page更新到data中
+      this.page = page
+    // 获取现有的内容
+      let tempArray = this.replyList
+
+    // 填充数据
+      tempList.forEach(ele => {
+        tempArray.push(ele)
+      })
+
+      this.replyList = tempArray
+      this.$apply()
+      wx.hideLoading()
     }
   };
 }
@@ -112,6 +163,11 @@ export default class Index extends wepy.page {
   }
 }
 
+.post-ctn {
+  height: 96rpx;
+  overflow: hidden;
+  word-break: break-all;
+}
 .name {
   color: #556cb0;
 }
