@@ -15,8 +15,8 @@
         </view>
         <view class="zan-cell zan-field">
           <view class="zan-cell__hd zan-field__title">验证码</view>
-          <input name="contactMobile" value="{{code}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactMobile" bindinput="handleZanFieldChange"/>
-          <button @tap="getCode" class="zan-btn zan-btn--small">获取验证码</button>
+          <input name="contactCode" value="{{code}}" class="zan-field__input zan-cell__bd" placeholder-class="zan-field__placeholder" data-component-id="form_contactCode" bindinput="handleZanFieldChange"/>
+          <button wx:if="{{!time}}" @tap="getCode" class="zan-btn zan-btn--small">获取验证码</button><button wx:if="{{time}}" @tap="getCode" class="zan-btn zan-btn--small">{{time}}s后重新获取</button>
         </view>
       </view>
       <view class="zan-btns">
@@ -43,7 +43,9 @@ import postRequire from '../api/postRequire'
 export default class PostNews extends wepy.page {
   data = {
     posting: false,
-    code: ''
+    code: '',
+    time: 0,
+    timer: ''
   };
   components = {
     NavBar,
@@ -56,6 +58,7 @@ export default class PostNews extends wepy.page {
     async formSubmit() {
       const contactName = this.input['form_contactName'] || this.user.infoName
       const contactMobile = this.input['form_contactMobile'] || this.user.infoMobile
+      const contactCode = this.input['form_contactCode']
       const rules = [
 
         {
@@ -69,9 +72,9 @@ export default class PostNews extends wepy.page {
           message: '输入正确的电话!'
         },
         {
-          value: contactMobile,
-          method: 'tel',
-          message: '输入正确的电话!'
+          value: contactCode,
+          method: 'required',
+          message: '请输入正确的验证码!'
         },
       ]
       if (!this.check(rules)) {
@@ -80,7 +83,7 @@ export default class PostNews extends wepy.page {
       if (!this.posting) {
         Tips.loading('上传中..')
         this.posting = true
-        const data = await postRequire.addOrUpdateUserInfo(contactName, contactMobile)
+        const data = await postRequire.addOrUpdateUserInfo(contactName, contactMobile, contactCode)
 
         if (data.status === 0) {
           Tips.success('修改成功', 2000)
@@ -90,6 +93,8 @@ export default class PostNews extends wepy.page {
           })
         }
         Tips.loaded()
+        clearInterval(this.timer)
+        this.time = 0
         this.posting = false
         this.$apply()
       }
@@ -103,7 +108,23 @@ export default class PostNews extends wepy.page {
 
     // 获取验证码
     async getCode() {
-      let phone = this.user.infoMobile
+      let phone = this.input['form_contactMobile'] || this.user.infoMobile
+      this.time = 60
+      this.$apply()
+      let that = this
+      this.timer = setInterval(() => {
+        that.time = that.time - 1
+        that.$apply()
+      }, 1000)
+
+      setTimeout(() => {
+        if (that.timer) {
+          clearInterval(that.timer)
+        }
+        that.time = 0
+        that.$apply()
+      }, 60000)
+
       if (!phone) {
         wx.showToast({
           title: '请输入电话',
@@ -111,7 +132,7 @@ export default class PostNews extends wepy.page {
         })
       } else {
         let res = await postRequire.getCode(phone)
-        if (!res.data.status) {
+        if (!res.status) {
           wx.showToast({
             title: '获取失败！',
             icon: '/static/images/icons/alert.png'
@@ -123,6 +144,12 @@ export default class PostNews extends wepy.page {
   mixins = [base, input];
   async onLoad() {
     await store.init()
+    this.$apply()
+  };
+
+  onUnload() {
+    clearInterval(this.timer)
+    this.time = 0
     this.$apply()
   }
 }

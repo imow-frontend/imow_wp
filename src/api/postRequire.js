@@ -100,11 +100,12 @@ export default class postRequire extends base {
     return result
   }
 
-  static async addOrUpdateUserInfo(name, mobile) {
+  static async addOrUpdateUserInfo(name, mobile, code) {
     const url = `${this.baseUrl}/Demand/AddOrUpdateUserInfo`
     const result = await this.post(url, {
       name,
-      mobile
+      mobile,
+      code
     })
     return result
   }
@@ -185,11 +186,11 @@ export default class postRequire extends base {
   }
 
    // 获取验证码
-  static async getCode(phone) {
+  static async getCode(mobile) {
     // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://10.10.10.73:8067` + `/getCode`
+    const url = `http://10.10.10.73:8067` + `/Demand/SendVerificationCode`
     const result = await this.get(url, {
-      phone
+      mobile
     })
     return result
   }
@@ -211,6 +212,5 @@ export default class postRequire extends base {
       promises.push(promise)
     })
     return Promise.all(promises)
-
   }
 }
