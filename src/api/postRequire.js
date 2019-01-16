@@ -121,8 +121,7 @@ export default class postRequire extends base {
 
   // 新增一条留言
   static async PublishMessage(postId, commentId, text) {
-    const url = `http://10.10.10.73:8067/Demand/PublishMessage`
-    // const url = `http://10.10.10.251:8067` + `/Demand/PublishMessage`
+    const url = `${this.baseUrl}/Demand/PublishMessage`
     const result = await this.post(url, {
       postId,
       commentId,
@@ -134,7 +133,6 @@ export default class postRequire extends base {
   // 旧获取留言列表
   static async GetMessageList(demandId, page) {
     const url = `${this.baseUrl}/Demand/GetMessageList`
-    // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
     const result = await this.get(url, {
       demandId,
       page
@@ -144,9 +142,7 @@ export default class postRequire extends base {
 
   // 获取留言列表新的
   static async GetMessageReplyList(demandId, page) {
-    // const url = `${this.baseUrl}/Demand/GetMessageReplyList`
-    // const url = `http://10.10.10.251:8067` + `/Demand/GetMessageList`
-    const url = `http://10.10.10.73:8067` + `/Demand/GetMessageReplyList`
+    const url = `${this.baseUrl}/Demand/GetMessageReplyList`
     const result = await this.get(url, {
       demandId,
       page
@@ -157,7 +153,6 @@ export default class postRequire extends base {
   // 删除留言
   static async DeleteMessage(messageId) {
     const url = `${this.baseUrl}/Demand/DeleteMessage`
-    // const url = `http://10.10.10.251:8067` + `/Demand/DeleteMessage`
     const result = await this.post(url, {
       messageId
     })
@@ -166,8 +161,7 @@ export default class postRequire extends base {
 
   // 获取回复的列表
   static async getCommentList(messageId, page) {
-    // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://10.10.10.73:8067` + `/Demand/GetReplyDetail`
+    const url = `${this.baseUrl}/Demand/GetReplyDetail`
     const result = await this.get(url, {
       messageId,
       page
@@ -177,8 +171,7 @@ export default class postRequire extends base {
 
   // 获取全部评论
   static async relateToMe(page) {
-    // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://10.10.10.73:8067` + `/Demand/RelateToMe`
+    const url = `${this.baseUrl}/Demand/RelateToMe`
     const result = await this.get(url, {
       page
     })
@@ -187,8 +180,7 @@ export default class postRequire extends base {
 
    // 获取验证码
   static async getCode(mobile) {
-    // const url = `${this.baseUrl}/Demand/GetReplyDetail`
-    const url = `http://10.10.10.73:8067` + `/Demand/SendVerificationCode`
+    const url = `${this.baseUrl}/Demand/SendVerificationCode`
     const result = await this.get(url, {
       mobile
     })
