@@ -17,7 +17,7 @@
                   <DIcon type="dingwei" />
                   <label class="pd">{{item.area}}</label>
                   <block wx:if="{{item.isAuction}}">
-                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="qjp" data-did="{{item.id}}">去竞拍</button>
+                    <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap.stop="qjp" data-did="{{item.id}}">去竞拍</button>
                   </block>
                   <block wx:else>
                     <block wx:if="{{user.imowUser && user.dlr}}">
@@ -66,12 +66,12 @@
                 <text> {{item.count}}次</text>
                 <FIcon type="fenge fr" />
               </view>
-              <view class="btnItem" @tap="HandelFollow" data-did="{{item.id}}">
+              <view class="btnItem" catchtap="HandelFollow" data-did="{{item.id}}">
                 <GIcon type="guanzhu" class="{{item.isFollow?'active':''}}" />
                 <text> {{item.isFollow?'取消关注':'关注'}}</text>
                 <FIcon type="fenge fr" />
               </view>
-              <view class="btnItem">
+              <view class="btnItem" catchtap="">
                 <button open-type="share" data-did="{{item.id}}" data-title="{{item.title}}" data-image="{{item.images[0]}}">分享</button>
               </view>
             </view>
