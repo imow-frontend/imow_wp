@@ -49,6 +49,16 @@
           </view>
         </view>
       </navigator>
+      <navigator url="/pages/comment">
+        <view class="cell-class zan-cell">
+          <view class="zan-cell__bd">
+            <view class="zan-cell__text">我的留言</view>
+          </view>
+          <view class="zan-cell__ft">
+            <zIcon type="ziliao" class="xlarge gary" />
+          </view>
+        </view>
+      </navigator>
     </view>
   </block>
 </template>

@@ -27,7 +27,7 @@
                       <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
                     </block>
                     <block wx:else>
-                      <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap.stop="yyx" data-did="{{item.id}}">有意向</button>
+                      <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap.stop="yyx" data-phone="{{item.contactMobile}}">拨打电话</button>
                     </block>
                   </block>
                 </view>
@@ -99,7 +99,7 @@ import router from '../../mixins/router'
 import Icon from '../Icon'
 import Avatar from '../share/avatar'
 import postRequire from '../../api/postRequire'
-import Tips from '../../utils/Tips'
+// import Tips from '../../utils/Tips'
 
 @connect({
   user: store.get('user')
@@ -161,22 +161,16 @@ export default class List extends wepy.component {
       wx.navigateTo({ url: `/pages/detail?id=${id}` })
     },
     yyx: async function(e) {
+      let phone = e.currentTarget.dataset.phone
       try {
-        await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
+        // await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
         if (!this.user.infoName || !this.user.infoMobile) {
           this.routeEditDetail()
           return
         }
-        if (!this.yyxLoading) {
-          this.yyxLoading = true
-          const id = e.currentTarget.dataset.did
-          const data = await postRequire.addInterested(id)
-          if (data.status === 0) {
-            Tips.success('已成功', 1000)
-          }
-          this.yyxLoading = false
-          this.$apply()
-        }
+        wx.makePhoneCall({
+          phoneNumber: phone
+        })
       } catch (error) {
         return false
       }

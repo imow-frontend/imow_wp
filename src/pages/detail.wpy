@@ -113,7 +113,8 @@
           </view>
         </view>
       </view>
-      <view wx:if="{{msgList.length}}" class="message">
+      <!-- 老留言 -->
+      <!-- <view wx:if="{{msgList.length}}" class="message">
         <view>留言板</view>
         <repeat for="{{msgList}}" key="index" index="index" item="ctn">
           <view class="message-item">
@@ -133,7 +134,25 @@
             </view>
           </view>
         </repeat>
+      </view> -->
+      <!-- 新留言 -->
+      <view>
+        <repeat for="{{commentList}}" key="index" index="index" item="item2">
+          <view class="comment">
+            <view>{{item2.commenter}} <button class="zan-btn zan-btn--small" style="float:right; width: auto;" wx-if="{{isPoster}}" data-phone="{{item2.phone}}" @tap="ringUp">联系他</button></view>
+            <view class="text">{{item2.text}}</view>
+            <view wx-if="{{item2.replyList.length}}" class="replyList">
+              <repeat for="{{item2.replyList}}" key="index" index="index" item="child">
+                <view><text class="name">{{child.replyer}}</text>：{{child.text}}</view>
+              </repeat>
+              <view @tap="readAllComment" data-commentid="{{item2.commentId}}">共{{item2.total}}条评论></view>
+            </view>
+            <view class="last"><view>第{{index + 1}}楼 <text>{{item.createTime}}</text></view> 
+            <text wx:if="{{ item2.isCommenter || isPoster }}" @tap="addMsg" data-commentid="{{item2.commentId}}" data-id="{{item.id}}">回复</text></view>
+          </view>
+        </repeat>
       </view>
+      <view style="padding-top: 60rpx;"></view>
     </view>
   </view>
 </template>
@@ -199,9 +218,9 @@ export default class Detail extends wepy.page {
     star: '', // 活动开始时间
     end: '', // 活动结束时间
     current: '', // 当前时间
-    msgList: [], // 初始化的留言列表
+    commentList: [], // 初始化的留言列表
     page: 1,
-    isCreater: false
+    isPoster: false
   };
   watch = {
     currentTime: function(val, oldval) {
@@ -258,9 +277,17 @@ export default class Detail extends wepy.page {
         return
       }
       let id = e.currentTarget.dataset.id
+      let commentId = e.currentTarget.dataset.commentid
 
       wx.navigateTo({
-        url: '/pages/edit?id=' + id
+        url: '/pages/edit?postId=' + id + '&commentId=' + commentId
+      })
+    },
+
+    readAllComment(e) {
+      let commentId = e.currentTarget.dataset.commentid
+      wx.navigateTo({
+        url: '/pages/reply?commentId=' + commentId + '&postId=' + this.id
       })
     },
 
@@ -481,10 +508,10 @@ export default class Detail extends wepy.page {
     })
     // 设置page
     let page = this.page + 1
-    let res = await postRequire.GetMessageList(String(this.id), page)
+    let res = await postRequire.GetMessageReplyList(String(this.id), page)
     // 保存有效数据
-    let tempList = res.list
-    this.isCreater = res.isCreater
+    let tempList = res.commentList
+    this.isPoster = res.isPoster
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -495,14 +522,14 @@ export default class Detail extends wepy.page {
     // 将page更新到data中
     this.page = page
     // 获取现有的内容
-    let tempArray = this.msgList
+    let tempArray = this.commentList
 
     // 填充数据
     tempList.forEach(ele => {
       tempArray.push(ele)
     })
 
-    this.msgList = tempArray
+    this.commentList = tempArray
     this.$apply()
     wx.hideLoading()
   }
@@ -514,10 +541,9 @@ export default class Detail extends wepy.page {
   // 每一次打开页面都会请求
   async onShow() {
     // 请求留言信息
-    let msgList = await postRequire.GetMessageList(String(this.id), 1)
-    let tempList = msgList.list
-    this.msgList = tempList
-    this.isCreater = msgList.isCreater
+    let res = await postRequire.GetMessageReplyList(String(this.id), 1)
+    this.commentList = res.commentList
+    this.isPoster = res.isPoster
     this.$apply()
   }
 
@@ -896,5 +922,52 @@ export default class Detail extends wepy.page {
       line-height: 30rpx;
     }
   }
+}
+
+.comment {
+  font-size: 30rpx;
+  padding: 6rpx 30rpx;
+  background-color: white;
+  color: #5a5a5a;
+  line-height: 1.6;
+
+  .text {
+    color: black;
+  }
+
+  .replyList {
+    background-color: #f7f7f7;
+    padding: 10rpx;
+
+    view:last-child {
+      color: #466d8e;
+      font-size: 26rpx;
+    }
+
+    .name {
+      color: #466d8e;
+    }
+  }
+
+  .last {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 2rpx solid #e7e7e7;
+    margin-top: 10rpx;
+    text {
+      font-size: 24rpx;
+    }
+  }
+}
+
+.comment:last-child .last {
+  border-bottom: none;
+}
+
+.comment view:first-child::after {
+  content: "";
+  clear: both;
+  display: block;
 }
 </style>

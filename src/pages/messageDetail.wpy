@@ -25,7 +25,7 @@
                 <label class="dia" @tap="dia" data-tel="{{item.contactMobile}}">{{item.contactMobile}}</label>
               </block>
               <block wx:else>
-                <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-did="{{item.id}}">有意向</button>
+                <button class="zan-btn zan-btn--primary zan-btn--mini yyx {{ yyxLoading?'zan-btn--loading':'' }}" @tap="yyx" data-phone="{{item.contactMobile}}">拨打电话</button>
               </block>
             </block>
           </view>
@@ -48,7 +48,7 @@
       </view>
       <view class="imgWapper">
         <repeat for="{{item.images}}" key="index" index="index" item="image">
-          <image mode="widthFix" src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" lazy-load="true" @tap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
+          <image mode="widthFix" src="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+'?x-oss-process=style/list_img'}}" lazy-load="true" catchtap="previewImg" id="{{'https://imow-app.oss-cn-hangzhou.aliyuncs.com/'+image+''}}" data-did="{{item.id}}" />
         </repeat>
       </view>
       <view class="btnWapper">
@@ -78,7 +78,8 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{msgList.length}}" class="message">
+    <!-- 老的留言 -->
+    <!-- <view wx:if="{{msgList.length}}" class="message">
         <view>留言板</view>
         <repeat for="{{msgList}}" key="index" index="index" item="ctn">
           <view class="message-item">
@@ -94,11 +95,29 @@
                   <text wx:if="{{!ctn.isSelf && isCreater}}" @tap="ringUp" data-phone="{{ctn.phone}}">拨打电话</text>
                 </view>
               </view>
-            <view>{{ctn.text}}</view>
+              <view>{{ctn.text}}</view>
+            </view>
           </view>
-        </view>
-      </repeat>
-    </view>
+        </repeat>
+      </view> -->
+      <!-- 新留言 -->
+      <view>
+        <repeat for="{{commentList}}" key="index" index="index" item="item2">
+          <view class="comment">
+            <view>{{item2.commenter}} <button class="zan-btn zan-btn--small" style="float:right; width: auto;" wx-if="{{isPoster}}" data-phone="{{item2.phone}}" @tap="ringUp">联系他</button></view>
+            <view class="text">{{item2.text}}</view>
+            <view wx-if="{{item2.replyList.length}}" class="replyList">
+              <repeat for="{{item2.replyList}}" key="index" index="index" item="child">
+                <view><text class="name">{{child.replyer}}</text>：{{child.text}}</view>
+              </repeat>
+              <view @tap="readAllComment" data-commentid="{{item2.commentId}}">共{{item2.total}}条评论></view>
+            </view>
+            <view class="last"><view>第{{index + 1}}楼 <text>{{item.createTime}}</text></view> 
+            <text wx:if="{{isPoster || item2.isCommenter}}" @tap="addMsg" data-commentid="{{item2.commentId}}" data-id="{{item.id}}">回复</text></view>
+          </view>
+        </repeat>
+      </view>
+      <view style="padding-top: 60rpx;"></view>
   </view>
 </template>
 
@@ -118,6 +137,7 @@ import onShareAppMessage from '../utils/Share'
 @connect({
   user: store.get('user')
 })
+
 export default class Index extends wepy.page {
   components = {
     NavBar,
@@ -131,12 +151,17 @@ export default class Index extends wepy.page {
   };
   data = {
     item: {},
-    msgList: [],
+    commentList: [],
     page: 1,
-    isCreater: false
+    isPoster: false
   };
   mixins = [router];
   methods = {
+    // 拨打电话联系发布人
+    bddh() {
+
+    },
+
     // 拨打电话
     ringUp(e) {
       let phone = e.currentTarget.dataset.phone
@@ -144,16 +169,28 @@ export default class Index extends wepy.page {
         phoneNumber: phone
       })
     },
-    dia(e) {
-      const tel = e.currentTarget.dataset.tel
-      wx.makePhoneCall({
-        phoneNumber: `${tel}`
-      })
-    },
 
+    // 去竞拍
     qjp: function(e) {
       const id = e.currentTarget.dataset.did
       wx.navigateTo({ url: `/pages/detail?id=${id}` })
+    },
+
+    // 有意向
+    yyx: async function(e) {
+      try {
+        let phone = e.currentTarget.dataset.phone
+        // await Tips.confirm('请耐心等待车主联系你。', {}, '我有意向')
+        if (!this.user.infoName || !this.user.infoMobile) {
+          this.routeEditDetail()
+          return
+        }
+        wx.makePhoneCall({
+          phoneNumber: phone
+        })
+      } catch (error) {
+        return false
+      }
     },
 
     // 跳转到添加留言页面
@@ -164,27 +201,24 @@ export default class Index extends wepy.page {
         return
       }
       let id = e.currentTarget.dataset.id
+      console.log(id)
+      let commentId = e.currentTarget.dataset.commentid
+
       wx.navigateTo({
-        url: '/pages/edit?id=' + id
+        url: '/pages/edit?postId=' + id + '&commentId=' + commentId
       })
     },
-    HandelFollow: async function(e) {
-      const id = e.currentTarget.dataset.did
-      const data = this.item.isFollow
-        ? await postRequire.removeFollow(id)
-        : await postRequire.addFollow(id)
-      if (data.status === 0) {
-        this.item.isFollow = !this.item.isFollow
-        this.$apply()
-      }
 
-      wx.showShareMenu({
-        withShareTicket: true
+    // 查看全部评论
+    readAllComment(e) {
+      let commentId = e.currentTarget.dataset.commentid
+      wx.navigateTo({
+        url: '/pages/reply?commentId=' + commentId + '&postId=' + this.id
       })
     },
 
     // 删除留言
-    async deleteMsg(e) {
+    async  deleteMsg(e) {
       let id = e.currentTarget.dataset.id
       let res = await postRequire.DeleteMessage(id)
       if (res.status === 0) {
@@ -207,13 +241,13 @@ export default class Index extends wepy.page {
           image: '/static/images/icon/error.png'
         })
       }
-    }
+    },
   };
 
   async onLoad(params) {
     Tips.loading('努力加载中')
     this.id = params.id
-    let res = await postRequire.AuctionDetail({ id: params.id })
+    let res = await postRequire.AuctionDetail({id: params.id})
     this.item = res[0]
     this.$apply()
     Tips.loaded()
@@ -226,11 +260,11 @@ export default class Index extends wepy.page {
     })
     // 设置page
     let page = this.page + 1
-    let res = await postRequire.GetMessageList(String(this.id), page)
+    let res = await postRequire.GetMessageReplyList(String(this.id), page)
     // 保存有效数据
-    let tempList = res.list
+    let tempList = res.commentList
     console.log(res.isCreater)
-    this.isCreater = res.isCreater
+    this.isPoster = res.isPoster
     if (tempList.length === 0) {
       wx.showToast({
         title: '已经到底了',
@@ -241,25 +275,24 @@ export default class Index extends wepy.page {
     // 将page更新到data中
     this.page = page
     // 获取现有的内容
-    let tempArray = this.msgList
+    let tempArray = this.commentList
 
     // 填充数据
     tempList.forEach(ele => {
       tempArray.push(ele)
     })
 
-    this.msgList = tempArray
+    this.commentList = tempArray
     this.$apply()
     wx.hideLoading()
   }
 
   async onShow() {
     // 请求留言信息
-    let msgList = await postRequire.GetMessageList(String(this.id), 1)
-    let tempList = msgList.list
-    console.log(msgList)
-    this.msgList = tempList
-    this.isCreater = msgList.isCreater
+    let res = await postRequire.GetMessageReplyList(this.id, 1)
+    console.log(res)
+    this.commentList = res.commentList
+    this.isPoster = res.isPoster
     this.$apply()
   }
   onShareAppMessage = onShareAppMessage;
@@ -278,25 +311,9 @@ page {
 .dia {
   color: #dd0a18;
 }
-
-.up {
-  .icon {
-    font-size: 20rpx;
-    line-height: 20rpx;
-    padding: 0rpx;
-    min-width: 0rpx;
-    width: auto;
-    color: #747474;
-    &.active {
-      color: #dd0a18;
-    }
-  }
-  .icon-jiagebaohu {
-    color: #240507;
-  }
-}
-
-.btnItem {
+.list {
+  margin-top: 30rpx;
+  background-color: #ededed;
   .icon {
     font-size: 20rpx;
     line-height: 20rpx;
@@ -473,7 +490,7 @@ page {
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid  #e5e5e5;
   padding: 10rpx 0;
   word-break: break-all;
   view {
@@ -482,6 +499,7 @@ page {
 
   .messageCtn {
     flex: 5;
+
   }
 }
 
@@ -494,7 +512,7 @@ page {
   .left {
     line-height: 30rpx;
     flex: 2.5;
-
+    
     .time {
       font-size: 20rpx;
       color: grey;
@@ -502,7 +520,7 @@ page {
   }
 
   .right {
-    flex: 1.2;
+    flex: 1;
     font-size: 20rpx;
     color: white;
 
@@ -515,5 +533,53 @@ page {
       line-height: 30rpx;
     }
   }
+}
+
+// 新评论
+.comment {
+  font-size: 30rpx;
+  padding: 6rpx 30rpx;
+  background-color: white;
+  color: #5a5a5a;
+  line-height: 1.6;
+
+  .text {
+    color: black;
+  }
+
+  .replyList {
+    background-color: #f7f7f7;
+    padding: 10rpx;
+
+    view:last-child {
+      color: #466d8e;
+      font-size: 26rpx;
+    }
+
+    .name {
+      color: #466d8e;
+    }
+  }
+
+  .last {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 2rpx solid #e7e7e7;
+    margin-top: 10rpx;
+    text {
+      font-size: 24rpx;
+    }
+  }
+}
+
+.comment:last-child .last {
+  border-bottom: none;
+}
+
+.comment view:first-child::after {
+  content: "";
+  clear: both;
+  display: block;
 }
 </style>

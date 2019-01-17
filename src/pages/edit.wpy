@@ -29,7 +29,7 @@ export default class PostNews extends wepy.page {
       if (this.flag) {
         this.flag = false
         this.$apply()
-        let res = await postRequire.PublishMessage(this.id, this.text)
+        let res = await postRequire.PublishMessage(this.postId, this.commentId, this.text)
         if (res.status === 0) {
           wx.showToast({
             title: '留言成功！',
@@ -68,8 +68,10 @@ export default class PostNews extends wepy.page {
   };
   mixins = [base, input];
   async onLoad(params) {
+    console.log(params)
     // 获取id
-    this.id = params.id
+    this.postId = params.postId
+    this.commentId = params.commentId === 'undefined' ? null : params.commentId
     // 设置id
     this.$apply()
   }

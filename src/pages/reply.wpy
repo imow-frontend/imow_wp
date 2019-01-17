@@ -1,0 +1,157 @@
+<template>
+  <view class="container">
+    <NavBar title="全部回复" />
+    <view class="comment-wrapper">
+      <view class="comment">
+        <view>
+          <view>{{listData.commenter}}</view>
+          <view class="time">{{listData.createTime}}</view>
+        </view>
+        <button @tap="reply" class="zan-btn zan-btn--small">回复</button>
+      </view>
+      <view class="ctn">{{listData.text}}</view>
+      <text style="color: #556cb0;" @tap="back">查看原发布内容</text>
+    </view>
+    <view class="msg-wrapper">
+      <repeat for="{{listData.replyList}}" key="index" index="index" item="comment">
+        <view class="item">
+          <view>
+            <view>{{comment.replyer}}</view>
+            <view class="time">{{comment.createTime}}</view>
+          </view>
+          <view><text class="name">@{{comment.commenter}} </text> {{comment.text}}</view>
+        </view>
+      </repeat>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import router from '../mixins/router'
+import NavBar from '../components/NavBar'
+import postRequire from '../api/postRequire'
+export default class Index extends wepy.page {
+  mixins = [router];
+  components = {
+    NavBar
+  };
+  data = {
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    listData: ''
+  };
+
+  async onLoad(params) {
+    this.commentId = params.commentId
+    this.postId = params.postId
+    this.$apply()
+  }
+
+  async onShow() {
+    let res = await postRequire.getCommentList(this.commentId, 1)
+    this.listData = res
+    this.$apply()
+  }
+
+  async onReachBottom() {
+    wx.showLoading({
+      title: '拼命加载中'
+    })
+    // 设置page
+    let page = this.page + 1
+    let res = await postRequire.getCommentList(String(this.commentId), page)
+    // 保存有效数据
+    let tempList = res.replyList
+    console.log(res.isCreater)
+    if (tempList.length === 0) {
+      wx.showToast({
+        title: '已经到底了',
+        image: '/static/images/icons/error.png'
+      })
+      return
+    }
+    // 将page更新到data中
+    this.page = page
+    // 获取现有的内容
+    let tempArray = this.listData.replyList
+
+    // 填充数据
+    tempList.forEach(ele => {
+      tempArray.push(ele)
+    })
+
+    this.listData.replyList = tempArray
+    this.$apply()
+    wx.hideLoading()
+  }
+
+  methods = {
+    back() {
+      wx.navigateBack({
+        delta: 1
+      })
+    },
+
+    reply() {
+      wx.navigateTo({
+        url: '/pages/edit?postId=' + this.postId + '&commentId=' + this.commentId
+      })
+    }
+  };
+}
+</script>
+
+<style lang="scss">
+@import "../zanui/btn.scss";
+
+page {
+  background-color: #eeeeee;
+}
+
+.comment-wrapper {
+  padding: 10rpx 30rpx 20rpx 30rpx;
+  background-color: white;
+
+  .comment {
+    line-height: 1.6;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .name {
+      font-size: 30rpx;
+    }
+
+    .time {
+      font-size: 24rpx;
+      color: #8a8a8a;
+    }
+  }
+  .ctn {
+    margin: 20rpx 0;
+  }
+}
+
+.msg-wrapper {
+  padding: 10rpx 30rpx;
+  background-color: #f7f7f7;
+
+  .item {
+    border-bottom: 2rpx solid #ebebeb;
+    padding-bottom: 10rpx;
+
+    .time {
+      font-size: 24rpx;
+      color: #8a8a8a;
+    }
+  }
+
+  .item:last-child {
+    border-bottom: none;
+  }
+
+  .name {
+    color: #556cb0;
+  }
+}
+</style>
